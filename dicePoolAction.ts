@@ -5,8 +5,13 @@ import { roll } from "./dicePool.ts";
 export function dicePoolAction(logger: Logger, message: Message, matchArray: RegExpMatchArray[]) {
     logger.info(message.content);
 
+    let text = "";
+    for (let index = 0; index < 10; index++) {
+        text += `[Jogada ${index}](https://www.youtube.com/)\n`;
+    }
+
     const embed = new MessageEmbed()
-    .setDescription('hello world')
+    .setDescription(text)
     .setColor(13198335)
     .setTitle('This is an embed');
 
