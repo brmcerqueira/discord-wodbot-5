@@ -1,5 +1,6 @@
 import { Logger } from "log4deno/index.ts";
 import { Message, MessageEmbed } from "katana/mod.ts";
+import { roll } from "./dicePool.ts";
 
 export function dicePoolAction(logger: Logger, message: Message, matchArray: RegExpMatchArray[]) {
     logger.info(message.content);
@@ -17,6 +18,11 @@ export function dicePoolAction(logger: Logger, message: Message, matchArray: Reg
                     embed.addField(key, result.groups[key]); 
                 }            
             }
+
+            let resultRoll = roll(parseInt(result.groups.dices), 10, true);
+            embed.addField("Successes", resultRoll.successes.toString()); 
+            embed.addField("Dices", resultRoll.dices.join(',')); 
+            embed.addField("IsCriticalFailure", resultRoll.isCriticalFailure ? "Sim" : "Não");
         }      
     }
 
