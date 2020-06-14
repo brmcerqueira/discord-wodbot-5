@@ -25,9 +25,10 @@ export function dicePoolAction(logger: Logger, message: Message, matchArray: Reg
             }
 
             let resultRoll = roll(parseInt(result.groups.dices), 10, true);
-            embed.addField("Successes", resultRoll.successes.toString()); 
-            embed.addField("Dices", resultRoll.dices.join(',')); 
-            embed.addField("IsCriticalFailure", resultRoll.isCriticalFailure ? "Sim" : "Não");
+            
+            embed.addField("Successes", resultRoll.successes.toString(), true); 
+            embed.addField("Dices", resultRoll.dices.join(','), true); 
+            embed.addField("IsCriticalFailure", resultRoll.isCriticalFailure ? "Sim" : "Não", true);
         }      
     }
 
