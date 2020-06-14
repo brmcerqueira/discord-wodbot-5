@@ -1,0 +1,6 @@
+{
+   "imports": {
+      "log4deno/": "https://deno.land/x/log4deno/",
+      "katana/": "https://deno.land/x/katana/"
+   }
+}
