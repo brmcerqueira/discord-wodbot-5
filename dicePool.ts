@@ -4,13 +4,6 @@ export type RollResult = {
   isCriticalFailure: boolean
 }
 
-export type Roll = {
-  amount: number,
-  explosion: number,
-  isCanceller: boolean
-  result: RollResult
-}
-
 export function roll(amount: number, explosion: number, isCanceller: boolean): RollResult {
   if (explosion) {
     if (explosion > 11) {
