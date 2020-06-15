@@ -5,13 +5,8 @@ import { roll } from "./dicePool.ts";
 export function dicePoolAction(logger: Logger, message: Message, matchArray: RegExpMatchArray[]) {
     logger.info(message.content);
 
-    let text = "";
-    for (let index = 0; index < 10; index++) {
-        text += `[Jogada ${index}](https://www.youtube.com/)\n`;
-    }
-
     const embed = new MessageEmbed()
-    .setDescription(text)
+    .setDescription("text")
     .setColor(13198335)
     .setTitle('This is an embed');
 
@@ -24,11 +19,13 @@ export function dicePoolAction(logger: Logger, message: Message, matchArray: Reg
                 }            
             }
 
-            let resultRoll = roll(parseInt(result.groups.dices), 10, true);
+            let resultRoll = roll(parseInt(result.groups.dices), 
+            result.groups.hunger ? parseInt(result.groups.hunger) : 0, 
+            result.groups.difficulty ? parseInt(result.groups.difficulty) : 1);
             
             embed.addField("Successes", resultRoll.successes.toString(), true); 
-            embed.addField("Dices", resultRoll.dices.join(','), true); 
-            embed.addField("IsCriticalFailure", resultRoll.isCriticalFailure ? "Sim" : "Não", true);
+            embed.addField("Dices", resultRoll.dices.map(d => `${d.value} - ${d.isHunger}`).join(','), true); 
+            embed.addField("Status", resultRoll.status.toString());
         }      
     }
 

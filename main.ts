@@ -24,7 +24,7 @@ type RegExpAction = {
 
 const regExpActions: RegExpAction[] = [
   {
-    regex: /^%(?<isSpecialization>\?)?(?<isCanceller>!)?(?<dices>[1-9]?\d)\s*(\*(?<difficulty>[1-9]?\d))?\s*(?<description>.*)/g,
+    regex: /^%(?<dices>[1-9]?\d)\s*(\!(?<hunger>[1-5]))?\s*(\*(?<difficulty>[2-9]))?\s*(?<description>.*)/g,
     action: dicePoolAction
   }
 ]

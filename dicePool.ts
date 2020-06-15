@@ -1,56 +1,74 @@
 export type RollResult = {
+  amount: number,
   successes: number,
-  dices: number[],
-  isCriticalFailure: boolean
+  difficulty: number,
+  status: RollStatus,
+  dices: DiceResult[]
 }
 
-export function roll(amount: number, explosion: number, isCanceller: boolean): RollResult {
-  if (explosion) {
-    if (explosion > 11) {
-      explosion = 11;
-    } else if (explosion < 8) {
-      explosion = 8;
-    }
-  } else {
-    explosion = 11
-  }
+export type DiceResult = {
+  value: number,
+  isHunger: boolean
+}
 
+export enum RollStatus {
+  BestialFailure,
+  Failure,
+  Success,
+  RegularCritical,
+  MessyCritical
+}
+
+export function roll(amount: number, hunger: number, difficulty: number): RollResult {
   let successes: number = 0;
-  let dices: number[] = [];
-  let isCriticalFailure: boolean = false;
-
-  if (amount <= 0) {
-    amount = 0;
-    let dice = d10();
-    if (dice == 10) {
+  let dices: DiceResult[] = [];
+  let status: RollStatus = RollStatus.Failure;
+  let criticalStatus: RollStatus | null = null;
+  let lastTen: DiceResult | null = null;
+  let hasBestialFailure: boolean = false;
+  
+  for (let i = 0; i < amount; i++) {
+    let dice = rollDice(i < hunger);
+    if (dice.value >= 6) {
       successes++;
-      amount++;
-    } else if (dice == 1) {
-      isCriticalFailure = true;
+      if (dice.value == 10) {
+        if (lastTen) {
+          successes += 2;
+          if (lastTen.isHunger || dice.isHunger) {
+            criticalStatus = RollStatus.MessyCritical;
+          } else if (criticalStatus != RollStatus.MessyCritical) {
+            criticalStatus = RollStatus.RegularCritical;
+          }
+          lastTen = null;
+        } else {
+          lastTen = dice;
+        }
+      }
+    } else if (dice.value == 1 && dice.isHunger) {
+      hasBestialFailure = true;
     }
     dices.push(dice);
   }
 
-  for (let i = 0; i < amount; i++) {
-    let dice = d10();
-    if (dice >= 8) {
-      successes++;
-      if (dice >= explosion) {
-        amount++;
-      }
-    } else if (isCanceller && dice == 1) {
-      successes--;
-    }
-    dices.push(dice);
+  if (successes >= difficulty) {
+    status = criticalStatus || RollStatus.Success;
+  }
+  else if (hasBestialFailure) {
+    status = RollStatus.BestialFailure;
   }
 
   return {
+    amount,
     successes,
-    dices: dices.sort((a, b) => b - a),
-    isCriticalFailure
+    difficulty,
+    status: status,
+    dices: dices.sort((left, right) => right.value - left.value),
   };
 }
 
-function d10(): number {
-  return Math.floor((Math.random() * 10) + 1);
+function rollDice(isHunger: boolean = false): DiceResult {
+  return {
+    value: Math.floor((Math.random() * 10) + 1),
+    isHunger: isHunger
+  };
 }
