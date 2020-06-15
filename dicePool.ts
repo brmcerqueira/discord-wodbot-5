@@ -1,7 +1,8 @@
 export type RollResult = {
   amount: number,
-  successes: number,
+  hunger: number
   difficulty: number,
+  successes: number,
   status: RollStatus,
   dices: DiceResult[]
 }
@@ -59,8 +60,9 @@ export function roll(amount: number, hunger: number, difficulty: number): RollRe
 
   return {
     amount,
-    successes,
+    hunger,
     difficulty,
+    successes,
     status: status,
     dices: dices.sort((left, right) => right.value - left.value),
   };

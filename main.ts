@@ -1,6 +1,7 @@
 import { Logger } from "log4deno/index.ts";
 import { Client, Message } from "katana/mod.ts";
 import { dicePoolAction } from "./dicePoolAction.ts";
+import { labels } from "./i18n/labels.ts";
 
 const logger = new Logger({
   default: {
@@ -14,7 +15,7 @@ const logger = new Logger({
 const client = new Client();
 
 client.on('ready', () => {
-  logger.info('Wodbot 5.0 entrou!');
+  logger.info(labels.welcome);
 });
 
 type RegExpAction = {
@@ -27,7 +28,7 @@ const regExpActions: RegExpAction[] = [
     regex: /^%(?<dices>[1-9]?\d)\s*(\!(?<hunger>[1-5]))?\s*(\*(?<difficulty>[2-9]))?\s*(?<description>.*)/g,
     action: dicePoolAction
   }
-]
+];
 
 client.on('message', (message: Message) => {
   for(let regExpAction of regExpActions) {
