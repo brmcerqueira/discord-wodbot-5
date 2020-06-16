@@ -9,5 +9,6 @@ export type LabelsType = {
     failure: string,
     success: string,
     regularCritical: string,
-    messyCritical: string
+    messyCritical: string,
+    reRollActionText: string
 }

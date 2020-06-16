@@ -11,5 +11,6 @@ export const pt: LabelsType = {
     failure: "Falha",
     success: "Sucesso",
     regularCritical: "Crítico",
-    messyCritical: "Crítico Confuso"
+    messyCritical: "Crítico Confuso",
+    reRollActionText: "Re-rolando última jogada...",
 };

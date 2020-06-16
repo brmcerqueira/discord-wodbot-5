@@ -21,15 +21,59 @@ export enum RollStatus {
 }
 
 export function roll(amount: number, hunger: number, difficulty: number): RollResult {
-  let successes: number = 0;
   let dices: DiceResult[] = [];
+  
+  for (let i = 0; i < amount; i++) {
+    dices.push(rollDice(i < hunger));
+  }
+
+  let computed = computedRoll(dices, difficulty);
+
+  return {
+    amount,
+    hunger,
+    difficulty,
+    successes: computed.successes,
+    status: computed.status,
+    dices: computed.dices
+  };
+}
+
+export function reRoll(result: RollResult, amount: number): RollResult {
+  for (let i = result.dices.length - 1; i >= 0; i--) {
+    if (!result.dices[i].isHunger) {
+      result.dices[i] = rollDice();
+      amount--;
+      if (amount == 0) {
+        break;
+      }
+    }
+  }
+
+  let computed = computedRoll(result.dices, result.difficulty);
+
+  return {
+    amount: result.amount,
+    hunger: result.hunger,
+    difficulty: result.difficulty,
+    successes: computed.successes,
+    status: computed.status,
+    dices: computed.dices
+  };
+}
+
+function computedRoll(dices: DiceResult[], difficulty: number): {
+  successes: number,
+  status: RollStatus,
+  dices: DiceResult[]
+} {
+  let successes: number = 0;
   let status: RollStatus = RollStatus.Failure;
   let criticalStatus: RollStatus | null = null;
   let lastTen: DiceResult | null = null;
   let hasBestialFailure: boolean = false;
   
-  for (let i = 0; i < amount; i++) {
-    let dice = rollDice(i < hunger);
+  for (const dice of dices) {
     if (dice.value >= 6) {
       successes++;
       if (dice.value == 10) {
@@ -48,7 +92,6 @@ export function roll(amount: number, hunger: number, difficulty: number): RollRe
     } else if (dice.value == 1 && dice.isHunger) {
       hasBestialFailure = true;
     }
-    dices.push(dice);
   }
 
   if (successes >= difficulty) {
@@ -59,9 +102,6 @@ export function roll(amount: number, hunger: number, difficulty: number): RollRe
   }
 
   return {
-    amount,
-    hunger,
-    difficulty,
     successes,
     status: status,
     dices: dices.sort((left, right) => right.value - left.value),
