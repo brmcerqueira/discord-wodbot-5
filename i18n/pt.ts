@@ -13,4 +13,6 @@ export const pt: LabelsType = {
     regularCritical: "Crítico",
     messyCritical: "Crítico Confuso",
     reRollActionText: "Re-rolando última jogada...",
+    configNotFound: "Nenhum arquivo de configuração encontrado.",
+    storytellerChangeDifficulty: "O narrador mudou a dificuldade."
 };

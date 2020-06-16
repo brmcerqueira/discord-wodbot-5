@@ -10,5 +10,7 @@ export type LabelsType = {
     success: string,
     regularCritical: string,
     messyCritical: string,
-    reRollActionText: string
+    reRollActionText: string,
+    configNotFound: string,
+    storytellerChangeDifficulty: string,
 }
