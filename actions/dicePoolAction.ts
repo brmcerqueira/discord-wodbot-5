@@ -23,7 +23,12 @@ export function dicePoolAction(logger: Logger, config: ConfigDef, message: Messa
 
             rollManager[message.user.id] = result;
 
-            message.channel.send(rollMessageEmbed(result, message.user.id, match.groups.description));
+            message.channel.send(rollMessageEmbed(result, message.user.id, match.groups.description))
+            .then(m => { 
+                m.react('1️⃣')
+                .then(() => m.react('2️⃣'))
+                .then(() => m.react('3️⃣'));
+            });
         }      
     }
 }
