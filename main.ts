@@ -6,6 +6,8 @@ import { dicePoolAction } from "./actions/dicePoolAction.ts";
 import { reRollAction } from "./actions/reRollAction.ts";
 import { setDifficultyAction } from "./actions/setDifficultyAction.ts";
 import { ConfigDef } from "./configDef.ts";
+import { MessageReaction } from "katana/src/models/MessageReaction.ts";
+import { reRollButton } from "./buttons/reRollButton.ts";
 
 const logger = new Logger({
   default: {
@@ -29,7 +31,13 @@ if (config) {
   
   type RegExpAction = {
     regex: RegExp,
-    action: (logger: Logger, config: any, message: Message, matchArray: RegExpMatchArray[]) => void
+    action: (logger: Logger, config: ConfigDef, message: Message, matchArray: RegExpMatchArray[]) => void
+  }
+
+  type EmojiButton = {
+    emojis: { [key: string]: any },
+    button: (logger: Logger, config: ConfigDef, reaction: MessageReaction, isAdd: boolean, value: any) => void,
+    addOrRemoveScope?: boolean
   }
   
   const regExpActions: RegExpAction[] = [
@@ -47,6 +55,17 @@ if (config) {
     }
   ];
   
+  const emojiButtons: EmojiButton[] = [
+    {
+      emojis: {
+        '1️⃣': 1,
+        '2️⃣': 2,
+        '3️⃣': 3
+      },
+      button: reRollButton
+    }
+  ]
+
   client.on('message', (message: Message) => {
     for(let regExpAction of regExpActions) {
       let resultMatchAll = [...message.content.matchAll(regExpAction.regex)];
@@ -58,6 +77,28 @@ if (config) {
     }
   });
   
+  function emojiButtonCallback(isAdd: boolean, reaction: MessageReaction) {
+    let name = <string> reaction.emoji.name;
+    for(let emojiButton of emojiButtons) {
+      let value = emojiButton.emojis[name];      
+      if (value && (emojiButton.addOrRemoveScope == undefined 
+      || (emojiButton.addOrRemoveScope && isAdd) 
+      || (!emojiButton.addOrRemoveScope && !isAdd))) {
+        logger.info(name);
+        emojiButton.button(logger, config, reaction, isAdd, value);
+        break;
+      }
+    }
+  }
+
+  client.on('messageReactionAdd', (reaction: MessageReaction) => { 
+    emojiButtonCallback(true, reaction);
+  });
+
+  client.on('messageReactionRemove', (reaction: MessageReaction) => { 
+    emojiButtonCallback(false, reaction);
+  });
+
   client.login(config.discordToken);
 }
 else {
