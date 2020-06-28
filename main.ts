@@ -8,6 +8,7 @@ import { setDifficultyAction } from "./actions/setDifficultyAction.ts";
 import { ConfigDef } from "./configDef.ts";
 import { MessageReaction } from "katana/src/models/MessageReaction.ts";
 import { reRollButton } from "./buttons/reRollButton.ts";
+import { loadToken } from "./googleOauth.ts";
 
 const logger = new Logger({
   default: {
@@ -102,6 +103,8 @@ if (config) {
   });
 
   client.login(config.discordToken);
+
+  loadToken(logger, config);
 }
 else {
   logger.info(labels.configNotFound);

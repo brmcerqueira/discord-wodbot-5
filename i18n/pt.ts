@@ -1,6 +1,9 @@
 import { LabelsType } from "./labelsType.ts";
 
 export const pt: LabelsType = {
+    urlAuth: "Entre no link para autenticar -> ",
+    authSuccess: "Autenticado com sucesso!",
+    closeThisFlap: "Ok! Pode fechar essa aba.",
     welcome: "Wodbot 5.0 entrou!",
     dices: "Dados",
     difficulty: "Dificuldade",

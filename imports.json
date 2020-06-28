@@ -2,6 +2,8 @@
    "imports": {
       "log4deno/": "https://deno.land/x/log4deno/",
       "config/": "https://deno.land/x/config/",
-      "katana/": "https://deno.land/x/katana/"
+      "katana/": "https://deno.land/x/katana/",
+      "soxa/": "https://deno.land/x/soxa/",
+      "http/": "https://deno.land/std@0.59.0/http/"
    }
 }

@@ -1,4 +1,7 @@
 export type LabelsType = {
+    urlAuth: string,
+    authSuccess: string,
+    closeThisFlap: string,
     welcome: string,
     dices: string,
     difficulty: string,
