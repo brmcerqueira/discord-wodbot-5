@@ -78,15 +78,17 @@ if (config) {
   });
   
   function emojiButtonCallback(isAdd: boolean, reaction: MessageReaction) {
-    let name = <string> reaction.emoji.name;
-    for(let emojiButton of emojiButtons) {
-      let value = emojiButton.emojis[name];      
-      if (value && (emojiButton.addOrRemoveScope == undefined 
-      || (emojiButton.addOrRemoveScope && isAdd) 
-      || (!emojiButton.addOrRemoveScope && !isAdd))) {
-        logger.info(name);
-        emojiButton.button(logger, config, reaction, isAdd, value);
-        break;
+    if (!reaction.me) {
+      let name = <string> reaction.emoji.name;
+      for(let emojiButton of emojiButtons) {
+        let value = emojiButton.emojis[name];      
+        if (value && (emojiButton.addOrRemoveScope == undefined 
+        || (emojiButton.addOrRemoveScope && isAdd) 
+        || (!emojiButton.addOrRemoveScope && !isAdd))) {
+          logger.info(name);
+          emojiButton.button(logger, config, reaction, isAdd, value);  
+          break;
+        }
       }
     }
   }

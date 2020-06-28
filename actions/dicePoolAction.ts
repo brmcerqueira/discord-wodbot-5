@@ -18,17 +18,30 @@ export function dicePoolAction(logger: Logger, config: ConfigDef, message: Messa
                 dif = parseInt(match.groups.difficulty);
             }
 
-            let result = roll(parseInt(match.groups.dices), 
-            match.groups.hunger ? parseInt(match.groups.hunger) : 0, dif);
+            let dices = parseInt(match.groups.dices);
+            let hunger = match.groups.hunger ? parseInt(match.groups.hunger) : 0;
+
+            let result = roll(dices, hunger, dif);
 
             rollManager[message.user.id] = result;
 
-            message.channel.send(rollMessageEmbed(result, message.user.id, match.groups.description))
-            .then(m => { 
-                m.react('1️⃣')
-                .then(() => m.react('2️⃣'))
-                .then(() => m.react('3️⃣'));
-            });
+            let promise = message.channel.send(rollMessageEmbed(result, message.user.id, match.groups.description));
+
+            let margin = dices - hunger;
+
+            if (margin > 0) {
+                promise.then(m => {
+                    let promiseReact = m.react('1️⃣');
+
+                    if (margin >= 2) {    
+                        promiseReact = promiseReact.then(r => m.react('2️⃣'));  
+                    } 
+                    
+                    if (margin >= 3) {    
+                        promiseReact = promiseReact.then(r => m.react('3️⃣'));  
+                    }
+                });
+            }
         }      
     }
 }
