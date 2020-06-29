@@ -34,7 +34,7 @@ export module characterManager {
         });
         return result;
     }
-'   '
+
     export function get(id: string): Promise<Character> {
         let ranges: string[] = [];
 
