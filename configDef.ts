@@ -1,8 +1,12 @@
 export type ConfigDef = {
     discordToken: string,
     storytellerId: string,
-    googleOauth: {
+    googleSheets: {
         clientId: string,
-        clientSecret: string
+        clientSecret: string,
+        apiKey: string
+    }
+    sheets: { 
+        [key: string]: string 
     }
 }
