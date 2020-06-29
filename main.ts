@@ -9,6 +9,7 @@ import { ConfigDef } from "./configDef.ts";
 import { MessageReaction } from "katana/src/models/MessageReaction.ts";
 import { reRollButton } from "./buttons/reRollButton.ts";
 import { googleSheets } from "./googleSheets.ts";
+import { characterManager } from "./characterManager.ts";
 
 const logger = new Logger({
   default: {
@@ -105,12 +106,7 @@ if (config) {
   googleSheets.init(logger, config).then(() => {
     client.login(config.discordToken);
     //Codigo apenas para teste...
-    googleSheets.valuesBatchGet(config.sheets[config.storytellerId], 
-    googleSheets.ValuesBatchGetMajorDimension.Columns, [
-      "Atributos!D3:D5",
-      "Atributos!D7:D9",
-      "Atributos!D11:D13"
-    ]).then(data => logger.info(JSON.stringify(data)));
+    characterManager.get(config.sheets[config.storytellerId]).then(c => logger.info(c));
   });
 }
 else {

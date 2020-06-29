@@ -37,7 +37,6 @@ export module googleSheets {
                             }).then(response => {
                                 httpServer.close();
                                 token = response.data;
-                                logger.info(token);
                                 logger.info(labels.authSuccess);
                                 result();
                             }).catch(response => {
@@ -68,9 +67,18 @@ export module googleSheets {
         DimensionUnspecified,
         Rows,
         Columns
-    }
+    };
 
-    export function valuesBatchGet(spreadSheetId: string, majorDimension: ValuesBatchGetMajorDimension, ranges: string[]): Promise<any> {               
+    export type ValuesBatchGetResult = { 
+        spreadsheetId: string,
+        valueRanges: {
+            range: string,
+            majorDimension: string,
+            values: string[][]
+        }[]
+    };
+
+    export function valuesBatchGet(spreadSheetId: string, majorDimension: ValuesBatchGetMajorDimension, ranges: string[]): Promise<ValuesBatchGetResult> {               
         let majorDimensionValue: string;
         switch (majorDimension) {
             case ValuesBatchGetMajorDimension.DimensionUnspecified:
