@@ -7,6 +7,10 @@ export type ConfigDef = {
         apiKey: string
     }
     sheets: { 
-        [key: string]: string 
+        commandsChannelId: string,
+        outputChannelId: string,
+        characters: { 
+            [key: string]: string[]
+        } 
     }
 }

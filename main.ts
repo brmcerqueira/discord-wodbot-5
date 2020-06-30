@@ -1,6 +1,6 @@
 import { Logger } from "log4deno/index.ts";
 import { Config } from "config/mod.ts";
-import { Client, Message } from "katana/mod.ts";
+import { Client, Message, TextChannel } from "katana/mod.ts";
 import { labels } from "./i18n/labels.ts";
 import { dicePoolAction } from "./actions/dicePoolAction.ts";
 import { reRollAction } from "./actions/reRollAction.ts";
@@ -26,9 +26,11 @@ const config: ConfigDef = <ConfigDef> await Config.load({
 
 if (config) {
   const client = new Client();
-
+  client.rest
   client.on('ready', () => {
     logger.info(labels.welcome);
+    let commandsChannel = <TextChannel> client.channels.get(config.sheets.commandsChannelId);
+    commandsChannel.send("teste"); 
   });
   
   type RegExpAction = {
@@ -106,7 +108,7 @@ if (config) {
   googleSheets.init(logger, config).then(() => {
     client.login(config.discordToken);
     //Codigo apenas para teste...
-    characterManager.get(config.sheets[config.storytellerId]).then(c => logger.info(c));
+    characterManager.get(config.sheets.characters[config.storytellerId][0]).then(c => logger.info(c));
   });
 }
 else {

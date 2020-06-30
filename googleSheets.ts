@@ -1,4 +1,3 @@
-import { soxa } from "soxa/mod.ts";
 import { serve } from "http/server.ts";
 import { Logger } from "log4deno/index.ts";
 import { ConfigDef } from "./configDef.ts";
@@ -8,6 +7,16 @@ export module googleSheets {
     let logger: Logger; 
     let config: ConfigDef;
     let token: any = null;
+
+    function treatResponse(response: Response): Promise<any> {
+        if (response.ok) {
+            return response.json();
+        }
+        else {
+            logger.error(response.statusText);
+            return Promise.reject(response.statusText);
+        }
+    }
 
     export function init($logger: Logger, $config: ConfigDef): Promise<void> {
         logger = $logger;
@@ -29,19 +38,22 @@ export module googleSheets {
                             postParams.append("grant_type", "authorization_code");
                             postParams.append("client_id", config.googleSheets.clientId);
                             postParams.append("client_secret", config.googleSheets.clientSecret);
-                            postParams.append("redirect_uri", "http://localhost:3000");        
-                            soxa.post("https://oauth2.googleapis.com/token", postParams.toString(), {
+                            postParams.append("redirect_uri", "http://localhost:3000");
+
+                            fetch("https://oauth2.googleapis.com/token", { 
+                                method: "POST",
                                 headers: {
                                     "Content-Type": "application/x-www-form-urlencoded"
-                                }                
-                            }).then(response => {
+                                },
+                                body: postParams
+                            }).then(treatResponse).then(data => {
                                 httpServer.close();
-                                token = response.data;
+                                token = data;
                                 logger.info(labels.authSuccess);
                                 result();
                             }).catch(response => {
                                 logger.error(response);
-                            });               
+                            });          
                         }
                         else {
                             request.respond({ status: 404 });
@@ -100,13 +112,14 @@ export module googleSheets {
             params.append("ranges", item);
         }
         
-        return soxa.get(`https://sheets.googleapis.com/v4/spreadsheets/${spreadSheetId}/values:batchGet?${params}`, {
+        return fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadSheetId}/values:batchGet?${params}`, { 
+            method: "GET",
             headers: {
                 Accept: "application/json",
                 Authorization: `Bearer ${token.access_token}`
-            }               
-        }).then(response => response.data).catch(response => {
+            }
+        }).then(treatResponse).catch(response => {
             logger.error(response);
-        });   
+        });  
     }
 }
