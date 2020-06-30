@@ -1,4 +1,4 @@
-import { Client, Message, TextChannel } from "katana/mod.ts";
+import { Client, Message, TextChannel, MessageEmbed } from "katana/mod.ts";
 import { labels } from "./i18n/labels.ts";
 import { dicePoolAction } from "./actions/dicePoolAction.ts";
 import { reRollAction } from "./actions/reRollAction.ts";
@@ -10,6 +10,7 @@ import { googleSheets } from "./googleSheets.ts";
 import { characterManager } from "./characterManager.ts";
 import { logger } from "./logger.ts";
 import { discord } from "./discord.ts";
+import { commands } from "./commands.ts";
 
 const client = new Client();
 
@@ -17,7 +18,27 @@ client.on('ready', () => {
   logger.info(labels.welcome);
   let commandsChannel = <TextChannel> client.channels.get(config.sheets.commandsChannelId);
   discord.deleteAllMessages(config.sheets.commandsChannelId).then(() => {
-    commandsChannel.send("teste"); 
+    Object.keys(commands).forEach(keyGroup => {
+      let embed = new MessageEmbed().setTitle(keyGroup);
+      let group = commands[keyGroup];
+
+      let keysCommand = Object.keys(group);
+
+      keysCommand.forEach(keyCommand => {
+        let command = group[keyCommand]
+        embed = embed.addField(keyCommand, command.name);
+      });
+
+      commandsChannel.send(embed)
+      /*.then(m => {
+        let promise: Promise<MessageReaction | null> | null = null;
+        keysCommand.forEach(keyCommand => {
+          let promiseReact = m.react(keyCommand);
+          promise = promise ? promise.then(r => promiseReact) : promiseReact;
+        });
+        return promise;
+      });*/
+    });  
   });
 });
 
