@@ -1,26 +1,13 @@
 import { serve } from "http/server.ts";
-import { Logger } from "log4deno/index.ts";
-import { ConfigDef } from "./configDef.ts";
 import { labels } from "./i18n/labels.ts";
+import { config } from "./config.ts";
+import { logger } from "./logger.ts";
+import { jsonResponse } from "./jsonResponse.ts";
 
 export module googleSheets {
-    let logger: Logger; 
-    let config: ConfigDef;
     let token: any = null;
 
-    function treatResponse(response: Response): Promise<any> {
-        if (response.ok) {
-            return response.json();
-        }
-        else {
-            logger.error(response.statusText);
-            return Promise.reject(response.statusText);
-        }
-    }
-
-    export function init($logger: Logger, $config: ConfigDef): Promise<void> {
-        logger = $logger;
-        config = $config;
+    export function auth(): Promise<void> {
         return new Promise<void>(result => {
             if (token) {
                 result(token);
@@ -46,7 +33,7 @@ export module googleSheets {
                                     "Content-Type": "application/x-www-form-urlencoded"
                                 },
                                 body: postParams
-                            }).then(treatResponse).then(data => {
+                            }).then(jsonResponse).then(data => {
                                 httpServer.close();
                                 token = data;
                                 logger.info(labels.authSuccess);
@@ -118,8 +105,6 @@ export module googleSheets {
                 Accept: "application/json",
                 Authorization: `Bearer ${token.access_token}`
             }
-        }).then(treatResponse).catch(response => {
-            logger.error(response);
-        });  
+        }).then(jsonResponse);
     }
 }

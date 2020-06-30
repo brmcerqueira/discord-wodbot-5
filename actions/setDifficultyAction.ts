@@ -1,10 +1,9 @@
-import { Logger } from "log4deno/index.ts";
 import { Message, MessageEmbed } from "katana/mod.ts";
 import { labels } from "../i18n/labels.ts";
 import { difficulty } from "../rollManager.ts";
-import { ConfigDef } from "../configDef.ts";
+import { config } from "../config.ts";
 
-export function setDifficultyAction(logger: Logger, config: ConfigDef, message: Message, matchArray: RegExpMatchArray[]) {
+export function setDifficultyAction(message: Message, matchArray: RegExpMatchArray[]) {
     for(let match of matchArray) {
         if (match.groups && config.storytellerId == message.user.id) {
             difficulty.current = parseInt(match.groups.difficulty);  

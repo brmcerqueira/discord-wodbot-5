@@ -1,116 +1,101 @@
-import { Logger } from "log4deno/index.ts";
-import { Config } from "config/mod.ts";
 import { Client, Message, TextChannel } from "katana/mod.ts";
 import { labels } from "./i18n/labels.ts";
 import { dicePoolAction } from "./actions/dicePoolAction.ts";
 import { reRollAction } from "./actions/reRollAction.ts";
 import { setDifficultyAction } from "./actions/setDifficultyAction.ts";
-import { ConfigDef } from "./configDef.ts";
+import { config } from "./config.ts";
 import { MessageReaction } from "katana/src/models/MessageReaction.ts";
 import { reRollButton } from "./buttons/reRollButton.ts";
 import { googleSheets } from "./googleSheets.ts";
 import { characterManager } from "./characterManager.ts";
+import { logger } from "./logger.ts";
+import { discord } from "./discord.ts";
 
-const logger = new Logger({
-  default: {
-    types: ['console'],
-    logLevel: ['DEBUG', 'INFO', 'WARN', 'ERROR', 'CRITICAL'],
-    logFormat: '[$date] [$level] [$name]',
-    dateFormat: 'yyyy-MM-dd HH:mm:ss',
-  }
-});
+const client = new Client();
 
-const config: ConfigDef = <ConfigDef> await Config.load({
-  file: 'default'
-});
-
-if (config) {
-  const client = new Client();
-  client.rest
-  client.on('ready', () => {
-    logger.info(labels.welcome);
-    let commandsChannel = <TextChannel> client.channels.get(config.sheets.commandsChannelId);
+client.on('ready', () => {
+  logger.info(labels.welcome);
+  let commandsChannel = <TextChannel> client.channels.get(config.sheets.commandsChannelId);
+  discord.deleteAllMessages(config.sheets.commandsChannelId).then(() => {
     commandsChannel.send("teste"); 
   });
-  
-  type RegExpAction = {
-    regex: RegExp,
-    action: (logger: Logger, config: ConfigDef, message: Message, matchArray: RegExpMatchArray[]) => void
-  }
+});
 
-  type EmojiButton = {
-    emojis: { [key: string]: any },
-    button: (logger: Logger, config: ConfigDef, reaction: MessageReaction, isAdd: boolean, value: any) => void,
-    addOrRemoveScope?: boolean
-  }
-  
-  const regExpActions: RegExpAction[] = [
-    {
-      regex: /^%(?<dices>[1-9]?\d)\s*(\!(?<hunger>[1-5]))?\s*(\*(?<difficulty>[2-9]))?\s*(?<description>.*)/g,
-      action: dicePoolAction
-    },
-    {
-      regex: /^%rr (?<dices>[1-3])/g,
-      action: reRollAction
-    },
-    {
-      regex: /^%dif (?<difficulty>[1-9])/g,
-      action: setDifficultyAction
-    }
-  ];
-  
-  const emojiButtons: EmojiButton[] = [
-    {
-      emojis: {
-        '1️⃣': 1,
-        '2️⃣': 2,
-        '3️⃣': 3
-      },
-      button: reRollButton
-    }
-  ]
+type RegExpAction = {
+  regex: RegExp,
+  action: (message: Message, matchArray: RegExpMatchArray[]) => void
+}
 
-  client.on('message', (message: Message) => {
-    for(let regExpAction of regExpActions) {
-      let resultMatchAll = [...message.content.matchAll(regExpAction.regex)];
-      if (resultMatchAll.length > 0) {
-        logger.info(message.user.id, message.content, resultMatchAll);
-        regExpAction.action(logger, config, message, resultMatchAll);
+type EmojiButton = {
+  emojis: { [key: string]: any },
+  button: (reaction: MessageReaction, isAdd: boolean, value: any) => void,
+  addOrRemoveScope?: boolean
+}
+
+const regExpActions: RegExpAction[] = [
+  {
+    regex: /^%(?<dices>[1-9]?\d)\s*(\!(?<hunger>[1-5]))?\s*(\*(?<difficulty>[2-9]))?\s*(?<description>.*)/g,
+    action: dicePoolAction
+  },
+  {
+    regex: /^%rr (?<dices>[1-3])/g,
+    action: reRollAction
+  },
+  {
+    regex: /^%dif (?<difficulty>[1-9])/g,
+    action: setDifficultyAction
+  }
+];
+
+const emojiButtons: EmojiButton[] = [
+  {
+    emojis: {
+      '1️⃣': 1,
+      '2️⃣': 2,
+      '3️⃣': 3
+    },
+    button: reRollButton
+  }
+]
+
+client.on('message', (message: Message) => {
+  for(let regExpAction of regExpActions) {
+    let resultMatchAll = [...message.content.matchAll(regExpAction.regex)];
+    if (resultMatchAll.length > 0) {
+      logger.info(message.user.id, message.content, resultMatchAll);
+      regExpAction.action(message, resultMatchAll);
+      break;
+    }
+  }
+});
+
+function emojiButtonCallback(isAdd: boolean, reaction: MessageReaction) {
+  if (!reaction.me) {
+    let name = <string> reaction.emoji.name;
+    for(let emojiButton of emojiButtons) {
+      let value = emojiButton.emojis[name];      
+      if (value && (emojiButton.addOrRemoveScope == undefined 
+      || (emojiButton.addOrRemoveScope && isAdd) 
+      || (!emojiButton.addOrRemoveScope && !isAdd))) {
+        logger.info(name);
+        emojiButton.button(reaction, isAdd, value);  
         break;
       }
     }
-  });
-  
-  function emojiButtonCallback(isAdd: boolean, reaction: MessageReaction) {
-    if (!reaction.me) {
-      let name = <string> reaction.emoji.name;
-      for(let emojiButton of emojiButtons) {
-        let value = emojiButton.emojis[name];      
-        if (value && (emojiButton.addOrRemoveScope == undefined 
-        || (emojiButton.addOrRemoveScope && isAdd) 
-        || (!emojiButton.addOrRemoveScope && !isAdd))) {
-          logger.info(name);
-          emojiButton.button(logger, config, reaction, isAdd, value);  
-          break;
-        }
-      }
-    }
   }
-
-  client.on('messageReactionAdd', (reaction: MessageReaction) => { 
-    emojiButtonCallback(true, reaction);
-  });
-
-  client.on('messageReactionRemove', (reaction: MessageReaction) => { 
-    emojiButtonCallback(false, reaction);
-  });
-
-  googleSheets.init(logger, config).then(() => {
-    client.login(config.discordToken);
-    //Codigo apenas para teste...
-    characterManager.get(config.sheets.characters[config.storytellerId][0]).then(c => logger.info(c));
-  });
 }
-else {
-  logger.info(labels.configNotFound);
-}
+
+client.on('messageReactionAdd', (reaction: MessageReaction) => { 
+  emojiButtonCallback(true, reaction);
+});
+
+client.on('messageReactionRemove', (reaction: MessageReaction) => { 
+  emojiButtonCallback(false, reaction);
+});
+
+googleSheets.auth().then(() => {
+  discord.setToken(config.discordToken);
+  client.login(config.discordToken);
+  //Codigo apenas para teste...
+  characterManager.get(config.sheets.characters[config.storytellerId][0]).then(c => logger.info(c));
+});

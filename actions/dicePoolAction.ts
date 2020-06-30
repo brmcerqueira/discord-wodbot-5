@@ -1,11 +1,9 @@
-import { Logger } from "log4deno/index.ts";
 import { Message } from "katana/mod.ts";
 import { roll } from "../dicePool.ts";
 import { rollMessageEmbed } from "../rollMessageEmbed.ts";
 import { rollManager, difficulty } from "../rollManager.ts";
-import { ConfigDef } from "../configDef.ts";
 
-export function dicePoolAction(logger: Logger, config: ConfigDef, message: Message, matchArray: RegExpMatchArray[]) {
+export function dicePoolAction(message: Message, matchArray: RegExpMatchArray[]) {
     for(let match of matchArray) {
         if (match.groups) {
             let dif = 1;
