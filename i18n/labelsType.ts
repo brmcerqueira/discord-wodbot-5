@@ -1,3 +1,8 @@
+export type DicePoolType = {
+    name: string,
+    description: string,
+}
+
 export type LabelsType = {
     urlAuth: string,
     authSuccess: string,
@@ -16,4 +21,7 @@ export type LabelsType = {
     reRollHelperText: string,
     configNotFound: string,
     storytellerChangeDifficulty: string,
+    dicePools: {
+        attackWithFists: DicePoolType
+    }
 }

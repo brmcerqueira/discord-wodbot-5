@@ -17,5 +17,11 @@ export const pt: LabelsType = {
     messyCritical: "Crítico Confuso",
     reRollHelperText: "Re-rolando {0} dado(s) da última jogada...",
     configNotFound: "Nenhum arquivo de configuração encontrado.",
-    storytellerChangeDifficulty: "O narrador mudou a dificuldade."
+    storytellerChangeDifficulty: "O narrador mudou a dificuldade.",
+    dicePools: {
+        attackWithFists: {
+            name: "Ataque com os Punhos",
+            description: "Ataque com os Punhos [Força + Briga]"
+        }
+    }
 };

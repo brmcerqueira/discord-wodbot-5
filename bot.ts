@@ -1,4 +1,5 @@
 import { RollResult } from "./diceRollManager.ts";
+import { TextChannel } from "katana/mod.ts";
 
 export module bot {
     export type LastRolls = {
@@ -8,7 +9,11 @@ export module bot {
         }
     }
     
-    export const lastRolls: LastRolls = {};
-    
+    export const lastRolls: LastRolls = {};   
     export let difficulty: number | null = null;
+
+    export module dicePools {
+        export let viewChannel: TextChannel;
+        export let outputChannel: TextChannel;    
+    }
 }
