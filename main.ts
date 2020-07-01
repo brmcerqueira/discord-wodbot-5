@@ -18,27 +18,20 @@ client.on('ready', () => {
   logger.info(labels.welcome);
   let commandsChannel = <TextChannel> client.channels.get(config.sheets.commandsChannelId);
   discord.deleteAllMessages(config.sheets.commandsChannelId).then(() => {
-    Object.keys(commands).forEach(keyGroup => {
-      let embed = new MessageEmbed().setTitle(keyGroup);
-      let group = commands[keyGroup];
+    let embed = new MessageEmbed().setTitle("keyGroup");
 
-      let keysCommand = Object.keys(group);
+    Object.keys(commands).forEach(key => {
+      let group = commands[key];
+      let text = "";
 
-      keysCommand.forEach(keyCommand => {
-        let command = group[keyCommand]
-        embed = embed.addField(keyCommand, command.name);
+      Object.keys(group).forEach(keyCommand => {
+        text += `${keyCommand} = ${group[keyCommand].name}\n`;
       });
 
-      commandsChannel.send(embed)
-      /*.then(m => {
-        let promise: Promise<MessageReaction | null> | null = null;
-        keysCommand.forEach(keyCommand => {
-          let promiseReact = m.react(keyCommand);
-          promise = promise ? promise.then(r => promiseReact) : promiseReact;
-        });
-        return promise;
-      });*/
+      embed = embed.addField(key, text, true);
     });  
+
+    return commandsChannel.send(embed);
   });
 });
 
