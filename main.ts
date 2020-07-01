@@ -11,27 +11,18 @@ import { characterManager } from "./characterManager.ts";
 import { logger } from "./logger.ts";
 import { discord } from "./discord.ts";
 import { commands } from "./commands.ts";
+import PromiseQueue from "./promiseQueue.ts";
 
 const client = new Client();
 
 client.on('ready', () => {
   logger.info(labels.welcome);
-  let commandsChannel = <TextChannel> client.channels.get(config.sheets.commandsChannelId);
   discord.deleteAllMessages(config.sheets.commandsChannelId).then(() => {
-    let embed = new MessageEmbed().setTitle("keyGroup");
-
-    Object.keys(commands).forEach(key => {
-      let group = commands[key];
-      let text = "";
-
-      Object.keys(group).forEach(keyCommand => {
-        text += `${keyCommand} = ${group[keyCommand].name}\n`;
-      });
-
-      embed = embed.addField(key, text, true);
-    });  
-
-    return commandsChannel.send(embed);
+    let commandsChannel = <TextChannel> client.channels.get(config.sheets.commandsChannelId);
+    let promiseQueue = new PromiseQueue();
+    Object.keys(commands).forEach(key => 
+      promiseQueue.add(() => commandsChannel.send(commands[key].name).then(m => m.react(key))));
+    promiseQueue.resume();
   });
 });
 
