@@ -1,5 +1,4 @@
 import { jsonResponse } from "./jsonResponse.ts";
-import { logger } from "./logger.ts";
 
 export module discord {
     const api = "https://discord.com/api/v6";
@@ -23,7 +22,7 @@ export module discord {
                     return Promise.resolve(false);
                 case 1:
                     return fetch(`${api}/channels/${channelId}/messages/${data[0].id}`, { 
-                        method: "GET",
+                        method: "DELETE",
                         headers: headers
                     }).then(jsonResponse).then(() => Promise.resolve(true));       
                 default:
@@ -36,5 +35,12 @@ export module discord {
                     }).then(jsonResponse).then(() => Promise.resolve(true)); 
             }
         });
+    }
+
+    export function deleteAllReactions(channelId: string, messageId: string): Promise<boolean> {
+        return fetch(`${api}/channels/${channelId}/messages/${messageId}/reactions`, { 
+            method: "DELETE",
+            headers: headers
+        }).then(jsonResponse).then(() => Promise.resolve(true)).catch(() => Promise.resolve(false));
     }
 }

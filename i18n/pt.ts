@@ -15,7 +15,7 @@ export const pt: LabelsType = {
     success: "Sucesso",
     regularCritical: "Crítico",
     messyCritical: "Crítico Confuso",
-    reRollActionText: "Re-rolando última jogada...",
+    reRollHelperText: "Re-rolando {0} dado(s) da última jogada...",
     configNotFound: "Nenhum arquivo de configuração encontrado.",
     storytellerChangeDifficulty: "O narrador mudou a dificuldade."
 };

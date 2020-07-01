@@ -21,7 +21,7 @@ client.on('ready', () => {
     let commandsChannel = <TextChannel> client.channels.get(config.sheets.commandsChannelId);
     let promiseQueue = new PromiseQueue();
     Object.keys(commands).forEach(key => 
-      promiseQueue.add(() => commandsChannel.send(commands[key].name).then(m => m.react(key))));
+      promiseQueue.add(() => commandsChannel.send(`__**${commands[key].name}**__`).then(m => m.react(key))));
     promiseQueue.resume();
   });
 });
