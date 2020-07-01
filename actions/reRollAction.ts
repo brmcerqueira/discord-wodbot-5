@@ -1,5 +1,5 @@
 import { Message } from "katana/mod.ts";
-import { reRollHelper } from "../rollManager.ts";
+import { reRollHelper } from "../utils/reRollHelper.ts";
 
 export function reRollAction(message: Message, matchArray: RegExpMatchArray[]) {
     for(let match of matchArray) {

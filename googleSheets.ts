@@ -2,7 +2,7 @@ import { serve } from "http/server.ts";
 import { labels } from "./i18n/labels.ts";
 import { config } from "./config.ts";
 import { logger } from "./logger.ts";
-import { jsonResponse } from "./jsonResponse.ts";
+import { jsonResponse } from "./utils/jsonResponse.ts";
 
 export module googleSheets {
     let token: any = null;

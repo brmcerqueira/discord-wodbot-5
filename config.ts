@@ -9,14 +9,14 @@ export type ConfigDef = {
         clientId: string,
         clientSecret: string,
         apiKey: string
-    }
-    sheets: { 
-        commandsChannelId: string,
-        outputChannelId: string,
-        characters: { 
-            [key: string]: string[]
-        } 
-    }
+    },
+    dicePools: { 
+        viewChannelId: string,
+        outputChannelId: string
+    },
+    characters: { 
+        [key: string]: string[]
+    } 
 }
 
 export const config: ConfigDef = <ConfigDef> await Config.load({

@@ -1,4 +1,4 @@
-import { Client, Message, TextChannel, MessageEmbed } from "katana/mod.ts";
+import { Client, Message, TextChannel } from "katana/mod.ts";
 import { labels } from "./i18n/labels.ts";
 import { dicePoolAction } from "./actions/dicePoolAction.ts";
 import { reRollAction } from "./actions/reRollAction.ts";
@@ -10,18 +10,18 @@ import { googleSheets } from "./googleSheets.ts";
 import { characterManager } from "./characterManager.ts";
 import { logger } from "./logger.ts";
 import { discord } from "./discord.ts";
-import { commands } from "./commands.ts";
-import PromiseQueue from "./promiseQueue.ts";
+import { dicePools } from "./dicePools.ts";
+import PromiseQueue from "./utils/promiseQueue.ts";
 
 const client = new Client();
 
 client.on('ready', () => {
   logger.info(labels.welcome);
-  discord.deleteAllMessages(config.sheets.commandsChannelId).then(() => {
-    let commandsChannel = <TextChannel> client.channels.get(config.sheets.commandsChannelId);
+  discord.deleteAllMessages(config.dicePools.viewChannelId).then(() => {
+    let commandsChannel = <TextChannel> client.channels.get(config.dicePools.viewChannelId);
     let promiseQueue = new PromiseQueue();
-    Object.keys(commands).forEach(key => 
-      promiseQueue.add(() => commandsChannel.send(`__**${commands[key].name}**__`).then(m => m.react(key))));
+    Object.keys(dicePools).forEach(key => 
+      promiseQueue.add(() => commandsChannel.send(`__**${dicePools[key].name}**__`).then(m => m.react(key))));
     promiseQueue.resume();
   });
 });
@@ -102,5 +102,5 @@ googleSheets.auth().then(() => {
   discord.setToken(config.discordToken);
   client.login(config.discordToken);
   //Codigo apenas para teste...
-  characterManager.get(config.sheets.characters[config.storytellerId][0]).then(c => logger.info(c));
+  characterManager.get(config.characters[config.storytellerId][0]).then(c => logger.info(c));
 });

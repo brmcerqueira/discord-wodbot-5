@@ -24,7 +24,7 @@ export function roll(amount: number, hunger: number, difficulty: number): RollRe
   let dices: DiceResult[] = [];
   
   for (let i = 0; i < amount; i++) {
-    dices.push(rollDice(i < hunger));
+    dices.push(throwDice(i < hunger));
   }
 
   let computed = computedRoll(dices, difficulty);
@@ -42,7 +42,7 @@ export function roll(amount: number, hunger: number, difficulty: number): RollRe
 export function reRoll(result: RollResult, amount: number): RollResult {
   for (let i = result.dices.length - 1; i >= 0; i--) {
     if (!result.dices[i].isHunger) {
-      result.dices[i] = rollDice();
+      result.dices[i] = throwDice();
       amount--;
       if (amount == 0) {
         break;
@@ -108,7 +108,7 @@ function computedRoll(dices: DiceResult[], difficulty: number): {
   };
 }
 
-function rollDice(isHunger: boolean = false): DiceResult {
+function throwDice(isHunger: boolean = false): DiceResult {
   return {
     value: Math.floor((Math.random() * 10) + 1),
     isHunger: isHunger

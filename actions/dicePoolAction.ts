@@ -1,17 +1,17 @@
 import { Message } from "katana/mod.ts";
-import { roll } from "../dicePool.ts";
-import { rollMessageEmbed } from "../rollMessageEmbed.ts";
-import { rollManager, difficulty } from "../rollManager.ts";
-import PromiseQueue from "../promiseQueue.ts";
+import { roll } from "../diceRollManager.ts";
+import PromiseQueue from "../utils/promiseQueue.ts";
+import { rollMessageEmbed } from "../utils/rollMessageEmbed.ts";
+import { bot } from "../bot.ts";
 
 export function dicePoolAction(message: Message, matchArray: RegExpMatchArray[]) {
     for(let match of matchArray) {
         if (match.groups) {
             let dif = 1;
 
-            if (difficulty.current) {
-                dif = difficulty.current;
-                difficulty.current = null;
+            if (bot.difficulty) {
+                dif = bot.difficulty;
+                bot.difficulty = null;
             }
             else if (match.groups.difficulty) {
                 dif = parseInt(match.groups.difficulty);
@@ -23,7 +23,7 @@ export function dicePoolAction(message: Message, matchArray: RegExpMatchArray[])
             let result = roll(dices, hunger, dif);
 
             message.channel.send(rollMessageEmbed(result, message.user.id, match.groups.description)).then(rollMessage => {
-                rollManager[message.user.id] = {
+                bot.lastRolls[message.user.id] = {
                     messageId: rollMessage.id,
                     result: result
                 };

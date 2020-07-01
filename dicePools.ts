@@ -1,10 +1,10 @@
-export type CommandsDef = {
+export type DicePools = {
     [emoji: string]: {
         name: string
     }
 }
 
-export const commands: CommandsDef = {
+export const dicePools: DicePools = {
     '1️⃣': {
         name: "um"
     },

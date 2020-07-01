@@ -1,4 +1,4 @@
-import { jsonResponse } from "./jsonResponse.ts";
+import { jsonResponse } from "./utils/jsonResponse.ts";
 
 export module discord {
     const api = "https://discord.com/api/v6";

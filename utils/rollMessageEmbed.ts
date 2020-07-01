@@ -1,6 +1,6 @@
 import { MessageEmbed } from "katana/mod.ts";
-import { RollStatus, RollResult } from "./dicePool.ts";
-import { labels } from "./i18n/labels.ts";
+import { RollResult, RollStatus } from "../diceRollManager.ts";
+import { labels } from "../i18n/labels.ts";
 
 export function rollMessageEmbed(result: RollResult, userId: string, title?: string): MessageEmbed {
     const embed = new MessageEmbed();
