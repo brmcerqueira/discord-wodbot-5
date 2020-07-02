@@ -3,7 +3,6 @@ import { TextChannel } from "katana/mod.ts";
 import { config } from "./config.ts";
 import { MessageScope } from "./messageScope.ts";
 import { MessageReaction } from "katana/src/models/MessageReaction.ts";
-import User from "katana/src/models/User.ts";
 
 export module bot {
     export const lastRolls: {
