@@ -1,4 +1,4 @@
-import { Client, Message, TextChannel } from "katana/mod.ts";
+import { Client, Message } from "katana/mod.ts";
 import { labels } from "./i18n/labels.ts";
 import { reRollAction } from "./actions/reRollAction.ts";
 import { setDifficultyAction } from "./actions/setDifficultyAction.ts";
@@ -14,6 +14,7 @@ import { dicePoolButton } from "./buttons/dicePoolButton.ts";
 import { rollAction } from "./actions/rollAction.ts";
 import { bot } from "./bot.ts";
 import { characterManager } from "./characterManager.ts";
+import { MessageScope } from "./messageScope.ts";
 
 const client = new Client();
 
@@ -38,7 +39,7 @@ type RegExpAction = {
 type EmojiButton = {
   emojis: { [key: string]: any },
   button: (reaction: MessageReaction, isAdd: boolean, value: any) => void,
-  addOrRemoveScope?: boolean
+  scopes?: MessageScope[]
 }
 
 const regExpActions: RegExpAction[] = [
@@ -87,9 +88,8 @@ function emojiButtonCallback(isAdd: boolean, reaction: MessageReaction) {
     let name = <string> reaction.emoji.name;
     for(let emojiButton of emojiButtons) {
       let value = emojiButton.emojis[name];      
-      if (value && (emojiButton.addOrRemoveScope == undefined 
-      || (emojiButton.addOrRemoveScope && isAdd) 
-      || (!emojiButton.addOrRemoveScope && !isAdd))) {
+      if (value && (emojiButton.scopes == undefined 
+      || bot.checkMessageScope(reaction, isAdd, emojiButton.scopes))) {
         logger.info(name);
         emojiButton.button(reaction, isAdd, value);  
         break;
