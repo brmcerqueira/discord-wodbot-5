@@ -7,7 +7,9 @@ import { bot } from "../bot.ts";
 
 export function dicePoolButton(reaction: MessageReaction, isAdd: boolean, dicePool: DicePool) {  
     reaction.users.forEach(user => {   
-        let spreadSheetId = config.playerCharacters[user.id];
+        let spreadSheetId = config.storytellerId == user.id 
+        ? bot.storytellerSpreadSheetId
+        : config.playerCharacters[user.id];
         if (spreadSheetId) { 
             const character = characterManager.characters[spreadSheetId];
             let result = dicePool.action(character);

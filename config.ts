@@ -8,7 +8,7 @@ export type ConfigDef = {
     dicePoolsChannelId: string,
     storytellerChannelId: string,
     outputChannelId: string,
-    characterLoadInterval: number,
+    characterLoadInterval?: number,
     googleSheets: {
         clientId: string,
         clientSecret: string,

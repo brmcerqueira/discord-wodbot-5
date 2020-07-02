@@ -153,9 +153,11 @@ export module characterManager {
         let done = promiseQueue.done;
         promiseQueue.resume();
 
-        setInterval(() => {
-            createCharacterPromiseQueue().resume();
-        }, config.characterLoadInterval);
+        if (config.characterLoadInterval) {
+            setInterval(() => {
+                createCharacterPromiseQueue().resume();
+            }, config.characterLoadInterval);
+        }
 
         return done;
     }
