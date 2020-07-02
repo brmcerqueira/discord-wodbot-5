@@ -1,7 +1,14 @@
 import { Character } from "./character.ts";
 import { googleSheets } from "./googleSheets.ts";
+import PromiseQueue from "./utils/promiseQueue.ts";
+import { config } from "./config.ts";
+import { logger } from "./logger.ts";
 
 export module characterManager {
+    export const characters: {
+        [id: string]: Character
+    } = {};
+
     const attributes: string = "Atributos";
     const skills: string = "Habilidades";
 
@@ -35,7 +42,7 @@ export module characterManager {
         return result;
     }
 
-    export function get(id: string): Promise<Character> {
+    function get(id: string): Promise<Character> {
         let ranges: string[] = [];
 
         for (const value of Object.values(binds)) {
@@ -122,5 +129,34 @@ export module characterManager {
                     }
                 }
             });
+    }
+
+    function createCharacterPromiseQueue(): PromiseQueue {
+        let promiseQueue = new PromiseQueue();
+
+        const loadCharacter = (id: string) => promiseQueue.add(() => get(id).then(c => {
+            logger.info(c);
+            characters[id] = c;
+        }))
+
+        Object.values(config.playerCharacters).forEach(loadCharacter);
+
+        for (const id of config.storytellerCharacters) {
+            loadCharacter(id);
+        }
+
+        return promiseQueue;
+    }
+
+    export function load(): Promise<void> {
+        let promiseQueue = createCharacterPromiseQueue();
+        let done = promiseQueue.done;
+        promiseQueue.resume();
+
+        setInterval(() => {
+            createCharacterPromiseQueue().resume();
+        }, config.characterLoadInterval);
+
+        return done;
     }
 }

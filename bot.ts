@@ -12,8 +12,7 @@ export module bot {
     export const lastRolls: LastRolls = {};   
     export let difficulty: number | null = null;
 
-    export module dicePools {
-        export let viewChannel: TextChannel;
-        export let outputChannel: TextChannel;    
-    }
+    export let dicePoolsChannel: TextChannel;
+    export let storytellerChannel: TextChannel;
+    export let outputChannel: TextChannel; 
 }

@@ -4,6 +4,10 @@ export default class PromiseQueue {
     private queue: Array<() => any>;
     private isPause: boolean;
     private count: number;
+    private doneDeferred: {
+        resolve: () => void 
+        reject: (reason?: any) => void
+    } | null = null;
 
     constructor(private concurrency: number = 1) {
         this.queue = [];
@@ -40,6 +44,11 @@ export default class PromiseQueue {
                     },
                     (error: Error) => {
                         reject(error);
+
+                        if (this.doneDeferred) {
+                            this.doneDeferred.reject(error);
+                        }
+
                         this.count--;
                         this.next();
                     });
@@ -55,12 +64,21 @@ export default class PromiseQueue {
         }
     }
 
-    public get waitingCount() {
+    public get waitingCount(): number {
         return this.queue.length;
     }
 
-    public get ongoingCount() {
+    public get ongoingCount(): number {
         return this.count;
+    }
+
+    public get done(): Promise<void> {      
+        return new Promise((resolve, reject) => {
+            this.doneDeferred = {
+                resolve: resolve,
+                reject: reject
+            };
+        });
     }
 
     private next() {
@@ -73,6 +91,9 @@ export default class PromiseQueue {
             if (firstQueueTask) {
                 firstQueueTask();
             }
+        }
+        else if (this.doneDeferred) {
+            this.doneDeferred.resolve();
         }
     }
 }

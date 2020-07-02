@@ -6,7 +6,6 @@ import { config } from "./config.ts";
 import { MessageReaction } from "katana/src/models/MessageReaction.ts";
 import { reRollButton } from "./buttons/reRollButton.ts";
 import { googleSheets } from "./googleSheets.ts";
-import { characterManager } from "./characterManager.ts";
 import { logger } from "./logger.ts";
 import { discord } from "./discord.ts";
 import { dicePools } from "./dicePools.ts";
@@ -14,17 +13,19 @@ import PromiseQueue from "./utils/promiseQueue.ts";
 import { dicePoolButton } from "./buttons/dicePoolButton.ts";
 import { rollAction } from "./actions/rollAction.ts";
 import { bot } from "./bot.ts";
+import { characterManager } from "./characterManager.ts";
 
 const client = new Client();
 
 client.on('ready', () => {
   logger.info(labels.welcome);
-  bot.dicePools.viewChannel = client.channels.get(config.dicePools.viewChannelId);
-  bot.dicePools.outputChannel = client.channels.get(config.dicePools.outputChannelId);
-  discord.deleteAllMessages(config.dicePools.viewChannelId).then(() => {
+  bot.dicePoolsChannel = client.channels.get(config.dicePoolsChannelId);
+  bot.storytellerChannel = client.channels.get(config.storytellerChannelId);
+  bot.outputChannel = client.channels.get(config.outputChannelId);
+  discord.deleteAllMessages(config.dicePoolsChannelId).then(() => {
     let promiseQueue = new PromiseQueue();
     Object.keys(dicePools).forEach(key => 
-      promiseQueue.add(() => bot.dicePools.viewChannel.send(`__**${dicePools[key].name}**__`).then(m => m.react(key))));
+      promiseQueue.add(() => bot.dicePoolsChannel.send(`__**${dicePools[key].name}**__`).then(m => m.react(key))));
     promiseQueue.resume();
   });
 });
@@ -105,7 +106,7 @@ client.on('messageReactionRemove', (reaction: MessageReaction) => {
   emojiButtonCallback(false, reaction);
 });
 
-googleSheets.auth().then(() => {
+googleSheets.auth().then(() => characterManager.load()).then(() => {
   discord.setToken(config.discordToken);
   client.login(config.discordToken);
 });

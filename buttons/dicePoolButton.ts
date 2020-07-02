@@ -7,18 +7,16 @@ import { bot } from "../bot.ts";
 
 export function dicePoolButton(reaction: MessageReaction, isAdd: boolean, dicePool: DicePool) {  
     reaction.users.forEach(user => {   
-        let sheets = config.characters[user.id];
-        let spreadSheetId = sheets && sheets[0] ? sheets[0] : null;
-        if (spreadSheetId) {
-            characterManager.get(spreadSheetId).then(character => {
-                let result = dicePool.action(character);
-                rollHelper(bot.dicePools.outputChannel, 
-                    user.id, 
-                    result.dices, 
-                    character.hunger, 
-                    result.difficulty, 
-                    dicePool.description);
-            });           
+        let spreadSheetId = config.playerCharacters[user.id];
+        if (spreadSheetId) { 
+            const character = characterManager.characters[spreadSheetId];
+            let result = dicePool.action(character);
+            rollHelper(bot.outputChannel, 
+                user.id, 
+                result.dices, 
+                character.hunger, 
+                result.difficulty, 
+                dicePool.description);
         }   
     });
 }

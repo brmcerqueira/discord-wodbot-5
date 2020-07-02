@@ -5,18 +5,19 @@ import { labels } from "./i18n/labels.ts";
 export type ConfigDef = {
     discordToken: string,
     storytellerId: string,
+    dicePoolsChannelId: string,
+    storytellerChannelId: string,
+    outputChannelId: string,
+    characterLoadInterval: number,
     googleSheets: {
         clientId: string,
         clientSecret: string,
         apiKey: string
     },
-    dicePools: { 
-        viewChannelId: string,
-        outputChannelId: string
+    playerCharacters: { 
+        [key: string]: string
     },
-    characters: { 
-        [key: string]: string[]
-    } 
+    storytellerCharacters: string[]
 }
 
 export const config: ConfigDef = <ConfigDef> await Config.load({
