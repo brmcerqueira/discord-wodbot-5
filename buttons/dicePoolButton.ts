@@ -5,7 +5,7 @@ import { config } from "../config.ts";
 import { characterManager } from "../characterManager.ts";
 import { bot } from "../bot.ts";
 
-export function dicePoolButton(reaction: MessageReaction, isAdd: boolean, dicePool: DicePool) {  
+export function dicePoolButton(reaction: MessageReaction, dicePool: DicePool) {  
     reaction.users.forEach(user => {   
         let spreadSheetId = config.storytellerId == user.id 
         ? bot.storytellerSpreadSheetId

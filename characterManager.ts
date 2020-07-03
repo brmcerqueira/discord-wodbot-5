@@ -131,7 +131,7 @@ export module characterManager {
             });
     }
 
-    function createCharacterPromiseQueue(): PromiseQueue {
+    export function loadCharactersPromiseQueue(): PromiseQueue {
         let promiseQueue = new PromiseQueue();
 
         const loadCharacter = (id: string) => promiseQueue.add(() => get(id).then(c => {
@@ -149,13 +149,13 @@ export module characterManager {
     }
 
     export function load(): Promise<void> {
-        let promiseQueue = createCharacterPromiseQueue();
+        let promiseQueue = loadCharactersPromiseQueue();
         let done = promiseQueue.done;
         promiseQueue.resume();
 
         if (config.characterLoadInterval) {
             setInterval(() => {
-                createCharacterPromiseQueue().resume();
+                loadCharactersPromiseQueue().resume();
             }, config.characterLoadInterval);
         }
 

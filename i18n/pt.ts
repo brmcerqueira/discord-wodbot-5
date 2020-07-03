@@ -23,5 +23,9 @@ export const pt: LabelsType = {
             name: "Ataque com os Punhos",
             description: "Ataque com os Punhos [Força + Briga]"
         }
+    },
+    commands: {
+        setDifficulty: "Alterar dificuldade",
+        reloadCharacters: "Recarregar personagens"
     }
 };

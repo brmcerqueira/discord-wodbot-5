@@ -23,5 +23,9 @@ export type LabelsType = {
     storytellerChangeDifficulty: string,
     dicePools: {
         attackWithFists: DicePoolType
+    },
+    commands: {
+        setDifficulty: string,
+        reloadCharacters: string
     }
 }

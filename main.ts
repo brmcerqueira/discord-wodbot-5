@@ -1,7 +1,6 @@
 import { Client, Message, TextChannel, MessageEmbed } from "katana/mod.ts";
 import { labels } from "./i18n/labels.ts";
 import { reRollAction } from "./actions/reRollAction.ts";
-import { setDifficultyAction } from "./actions/setDifficultyAction.ts";
 import { config } from "./config.ts";
 import { MessageReaction } from "katana/src/models/MessageReaction.ts";
 import { reRollButton } from "./buttons/reRollButton.ts";
@@ -15,7 +14,7 @@ import { rollAction } from "./actions/rollAction.ts";
 import { bot } from "./bot.ts";
 import { characterManager } from "./characterManager.ts";
 import { MessageScope } from "./messageScope.ts";
-import { Command } from "./command.ts";
+import { Command, commands } from "./command.ts";
 
 const client = new Client();
 
@@ -42,7 +41,12 @@ export function buildChannelCommands(channelId: string, commands: Command[]): Pr
         }
         const reactPromiseQueue = new PromiseQueue();
         const reactDone = reactPromiseQueue.done;
-        command.reactions.forEach(r => reactPromiseQueue.add(() => message.react(r)));
+
+        (Array.isArray(command.reactions) 
+        ? command.reactions 
+        : Object.keys(command.reactions))
+        .forEach(r => reactPromiseQueue.add(() => message.react(r)));
+        
         reactPromiseQueue.resume();
         return reactDone;
       }));
@@ -65,8 +69,10 @@ client.on('ready', () => {
       message: `__**${dicePools[key].name}**__`,
       reactions: [key]
     };
-  })).then(c => bot.dicePoolsChannel = c);
-  //buildChannelCommands(config.storytellerChannelId, []).then(c => bot.storytellerChannel = c);
+  })).then(dicePoolsChannel => {
+    bot.dicePoolsChannel = dicePoolsChannel;
+    return buildChannelCommands(config.storytellerChannelId, commands).then(c => bot.storytellerChannel = c);
+  }); 
 });
 
 type RegExpAction = {
@@ -76,7 +82,7 @@ type RegExpAction = {
 
 type EmojiButton = {
   emojis: { [key: string]: any },
-  button: (reaction: MessageReaction, isAdd: boolean, value: any) => void,
+  button: (reaction: MessageReaction, value: any, scopes?: MessageScope[]) => void,
   scopes?: MessageScope[]
 }
 
@@ -88,14 +94,36 @@ const regExpActions: RegExpAction[] = [
   {
     regex: /^%rr (?<dices>[1-3])/g,
     action: reRollAction
-  },
-  {
-    regex: /^%dif (?<difficulty>[1-9])/g,
-    action: setDifficultyAction
   }
 ];
 
-const emojiButtons: EmojiButton[] = [
+function buildEmojiButtons(defaultButtons: EmojiButton[]): EmojiButton[] {
+    const result = [];
+
+    for (const command of commands) {
+      let emojis: { [key: string]: any };
+
+      if (Array.isArray(command.reactions)) {
+        emojis = {};
+        command.reactions.forEach(r => emojis[r] = r);
+      } else {
+        emojis = command.reactions;
+      }
+
+      result.push({
+        emojis: emojis,
+        button: command.button
+      });
+    }
+
+    for (const button of defaultButtons) {
+      result.push(button);
+    }
+
+    return result;    
+}
+
+const emojiButtons: EmojiButton[] = buildEmojiButtons([
   {
     emojis: {
       '1️⃣': 1,
@@ -108,7 +136,7 @@ const emojiButtons: EmojiButton[] = [
     emojis: dicePools,
     button: dicePoolButton
   }
-];
+]);
 
 client.on('message', (message: Message) => {
   for(let regExpAction of regExpActions) {
@@ -129,7 +157,7 @@ function emojiButtonEvent(isAdd: boolean, reaction: MessageReaction) {
       if (value && (emojiButton.scopes == undefined 
       || bot.checkMessageScope(reaction, isAdd, emojiButton.scopes))) {
         logger.info(name);
-        emojiButton.button(reaction, isAdd, value);  
+        emojiButton.button(reaction, value, emojiButton.scopes);  
         break;
       }
     }
