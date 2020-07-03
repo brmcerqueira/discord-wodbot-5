@@ -3,6 +3,7 @@ import { TextChannel } from "katana/mod.ts";
 import { config } from "./config.ts";
 import { MessageScope } from "./messageScope.ts";
 import { MessageReaction } from "katana/src/models/MessageReaction.ts";
+import { logger } from "./logger.ts";
 
 export module bot {
     export const lastRolls: {
@@ -20,7 +21,7 @@ export module bot {
         for (const scope of scopes) {
             if ((scope == MessageScope.AddEvent && !isAdd)
             || (scope == MessageScope.RemoveEvent && isAdd)
-            || (scope == MessageScope.Storyteller && !reaction.users.get(config.storytellerId))
+            || (scope == MessageScope.Storyteller && !reaction.users.has(config.storytellerId))
             || (scopeMessages[reaction.message.id] 
                 && scopeMessages[reaction.message.id].indexOf(scope) == -1)) {
                 return false;

@@ -1,4 +1,4 @@
-import { Client, Message, TextChannel, MessageEmbed } from "katana/mod.ts";
+import { Client, Message, TextChannel } from "katana/mod.ts";
 import { labels } from "./i18n/labels.ts";
 import { reRollAction } from "./actions/reRollAction.ts";
 import { config } from "./config.ts";
@@ -112,7 +112,8 @@ function buildEmojiButtons(defaultButtons: EmojiButton[]): EmojiButton[] {
 
       result.push({
         emojis: emojis,
-        button: command.button
+        button: command.button,
+        scopes: command.scopes
       });
     }
 
