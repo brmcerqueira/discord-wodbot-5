@@ -18,12 +18,16 @@ export module bot {
     } = {};
 
     export function checkMessageScope(reaction: MessageReaction, isAdd: boolean, scopes: MessageScope[]): boolean {
+        logger.info(reaction.message.id, scopes);
         for (const scope of scopes) {
             if ((scope == MessageScope.AddEvent && !isAdd)
             || (scope == MessageScope.RemoveEvent && isAdd)
             || (scope == MessageScope.Storyteller && !reaction.users.has(config.storytellerId))
-            || (scopeMessages[reaction.message.id] 
-                && scopeMessages[reaction.message.id].indexOf(scope) == -1)) {
+            || ((scope != MessageScope.AddEvent 
+                && scope != MessageScope.RemoveEvent 
+                && scope != MessageScope.Storyteller) 
+                && (!scopeMessages[reaction.message.id] || (scopeMessages[reaction.message.id] 
+                && scopeMessages[reaction.message.id].indexOf(scope) == -1)))) {
                 return false;
             }          
         }

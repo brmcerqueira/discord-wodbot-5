@@ -1,6 +1,5 @@
 import { Client, Message, TextChannel } from "katana/mod.ts";
 import { labels } from "./i18n/labels.ts";
-import { reRollAction } from "./actions/reRollAction.ts";
 import { config } from "./config.ts";
 import { MessageReaction } from "katana/src/models/MessageReaction.ts";
 import { reRollButton } from "./buttons/reRollButton.ts";
@@ -90,10 +89,6 @@ const regExpActions: RegExpAction[] = [
   {
     regex: /^%(?<dices>[1-9]?\d)\s*(\!(?<hunger>[1-5]))?\s*(\*(?<difficulty>[2-9]))?\s*(?<description>.*)/g,
     action: rollAction
-  },
-  {
-    regex: /^%rr (?<dices>[1-3])/g,
-    action: reRollAction
   }
 ];
 
