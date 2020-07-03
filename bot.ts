@@ -29,11 +29,11 @@ export module bot {
         return true;
     }
 
-    export function addMessageScope(messageId: string, ...args: MessageScope[]): void {
+    export function addMessageScope(messageId: string, scopes: MessageScope[]): void {
         if (!scopeMessages[messageId]) {
             scopeMessages[messageId] = [];
         }
-        args.forEach(s => scopeMessages[messageId].push(s));
+        scopes.forEach(s => scopeMessages[messageId].push(s));
     }
 
     export let difficulty: number | null = null;

@@ -1,4 +1,4 @@
-import { Client, Message } from "katana/mod.ts";
+import { Client, Message, TextChannel, MessageEmbed } from "katana/mod.ts";
 import { labels } from "./i18n/labels.ts";
 import { reRollAction } from "./actions/reRollAction.ts";
 import { setDifficultyAction } from "./actions/setDifficultyAction.ts";
@@ -15,20 +15,58 @@ import { rollAction } from "./actions/rollAction.ts";
 import { bot } from "./bot.ts";
 import { characterManager } from "./characterManager.ts";
 import { MessageScope } from "./messageScope.ts";
+import { Command } from "./command.ts";
 
 const client = new Client();
 
+export function buildChannelCommands(channelId: string, commands: Command[]): Promise<TextChannel> {
+  const channel: TextChannel = client.channels.get(channelId);
+
+  return discord.getAllMessages(channelId).then(data => {
+      switch (data.length) {
+          case 0:
+              return Promise.resolve();
+          case 1:
+              return client.rest.deleteMessage(channelId, data[0].id).then(() => Promise.resolve()); 
+          default:
+              return discord.bulkDeleteMessages(channelId, data.map(m => m.id)).then(() => Promise.resolve());
+      }
+  }).then(() => {
+    const promiseQueue = new PromiseQueue();
+    const done = promiseQueue.done;
+
+    for (const command of commands) {
+      promiseQueue.add(() => channel.send(command.message).then(message => {
+        if (command.scopes) {
+          bot.addMessageScope(message.id, command.scopes);
+        }
+        const reactPromiseQueue = new PromiseQueue();
+        const reactDone = reactPromiseQueue.done;
+        command.reactions.forEach(r => reactPromiseQueue.add(() => message.react(r)));
+        reactPromiseQueue.resume();
+        return reactDone;
+      }));
+    }
+
+    promiseQueue.resume();
+
+    return done;
+  }).then(() => Promise.resolve(channel)); 
+}
+
 client.on('ready', () => {
   logger.info(labels.welcome);
+  bot.outputChannel = client.channels.get(config.outputChannelId);
+
   bot.dicePoolsChannel = client.channels.get(config.dicePoolsChannelId);
   bot.storytellerChannel = client.channels.get(config.storytellerChannelId);
-  bot.outputChannel = client.channels.get(config.outputChannelId);
-  discord.deleteAllMessages(config.dicePoolsChannelId).then(() => {
-    let promiseQueue = new PromiseQueue();
-    Object.keys(dicePools).forEach(key => 
-      promiseQueue.add(() => bot.dicePoolsChannel.send(`__**${dicePools[key].name}**__`).then(m => m.react(key))));
-    promiseQueue.resume();
-  });
+  buildChannelCommands(config.dicePoolsChannelId, Object.keys(dicePools).map(key => {
+    return {
+      message: `__**${dicePools[key].name}**__`,
+      reactions: [key]
+    };
+  })).then(c => bot.dicePoolsChannel = c);
+  //buildChannelCommands(config.storytellerChannelId, []).then(c => bot.storytellerChannel = c);
 });
 
 type RegExpAction = {
@@ -83,7 +121,7 @@ client.on('message', (message: Message) => {
   }
 });
 
-function emojiButtonCallback(isAdd: boolean, reaction: MessageReaction) {
+function emojiButtonEvent(isAdd: boolean, reaction: MessageReaction) {
   if (!reaction.me) {
     let name = <string> reaction.emoji.name;
     for(let emojiButton of emojiButtons) {
@@ -99,11 +137,11 @@ function emojiButtonCallback(isAdd: boolean, reaction: MessageReaction) {
 }
 
 client.on('messageReactionAdd', (reaction: MessageReaction) => { 
-  emojiButtonCallback(true, reaction);
+  emojiButtonEvent(true, reaction);
 });
 
 client.on('messageReactionRemove', (reaction: MessageReaction) => { 
-  emojiButtonCallback(false, reaction);
+  emojiButtonEvent(false, reaction);
 });
 
 googleSheets.auth().then(() => characterManager.load()).then(() => {
