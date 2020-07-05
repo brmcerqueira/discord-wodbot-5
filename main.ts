@@ -60,9 +60,6 @@ export function buildChannelCommands(channelId: string, commands: Command[]): Pr
 client.on('ready', () => {
   logger.info(labels.welcome);
   bot.outputChannel = client.channels.get(config.outputChannelId);
-
-  bot.dicePoolsChannel = client.channels.get(config.dicePoolsChannelId);
-  bot.storytellerChannel = client.channels.get(config.storytellerChannelId);
   buildChannelCommands(config.dicePoolsChannelId, Object.keys(dicePools).map(key => {
     return {
       message: `__**${dicePools[key].name}**__`,
