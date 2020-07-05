@@ -1,5 +1,6 @@
 {
   "scripts": {
-    "start": "deno run -c tsconfig.json --allow-net --allow-read --importmap=imports.json --unstable main.ts"
+    "start": "deno run -c tsconfig.json --allow-net --allow-read --importmap=imports.json --unstable main.ts",
+    "debug": "deno run -c tsconfig.json --inspect-brk --allow-net --allow-read --importmap=imports.json --unstable main.ts"
   }
 }
