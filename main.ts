@@ -13,87 +13,92 @@ import { rollAction } from "./actions/rollAction.ts";
 import { bot } from "./bot.ts";
 import { characterManager } from "./characterManager.ts";
 import { MessageScope } from "./messageScope.ts";
-import { Command, commands } from "./command.ts";
+import { Command, buildCommands } from "./command.ts";
 
-const client = new Client();
+googleSheets.auth().then(() => characterManager.load()).then(() => {
+  const commands = buildCommands();
 
-export function buildChannelCommands(channelId: string, commands: Command[]): Promise<TextChannel> {
-  const channel: TextChannel = client.channels.get(channelId);
+  const client = new Client();
 
-  return discord.getAllMessages(channelId).then(data => {
+  function buildChannelCommands(channelId: string, commands: Command[]): Promise < TextChannel > {
+    const channel: TextChannel = client.channels.get(channelId);
+
+    return discord.getAllMessages(channelId).then(data => {
       switch (data.length) {
-          case 0:
-              return Promise.resolve();
-          case 1:
-              return client.rest.deleteMessage(channelId, data[0].id).then(() => Promise.resolve()); 
-          default:
-              return discord.bulkDeleteMessages(channelId, data.map(m => m.id)).then(() => Promise.resolve());
+        case 0:
+          return Promise.resolve();
+        case 1:
+          return client.rest.deleteMessage(channelId, data[0].id).then(() => Promise.resolve());
+        default:
+          return discord.bulkDeleteMessages(channelId, data.map(m => m.id)).then(() => Promise.resolve());
       }
-  }).then(() => {
-    const promiseQueue = new PromiseQueue();
-    const done = promiseQueue.done;
+    }).then(() => {
+      const promiseQueue = new PromiseQueue();
+      const done = promiseQueue.done;
 
-    for (const command of commands) {
-      promiseQueue.add(() => channel.send(command.message).then(message => {
-        if (command.scopes) {
-          bot.addMessageScope(message.id, command.scopes);
-        }
-        const reactPromiseQueue = new PromiseQueue();
-        const reactDone = reactPromiseQueue.done;
+      for (const command of commands) {
+        promiseQueue.add(() => channel.send(command.message).then(message => {
+          if (command.scopes) {
+            bot.addMessageScope(message.id, command.scopes);
+          }
+          const reactPromiseQueue = new PromiseQueue();
+          const reactDone = reactPromiseQueue.done;
 
-        (Array.isArray(command.reactions) 
-        ? command.reactions 
-        : Object.keys(command.reactions))
-        .forEach(r => reactPromiseQueue.add(() => message.react(r)));
-        
-        reactPromiseQueue.resume();
-        return reactDone;
-      }));
-    }
+          (Array.isArray(command.reactions) ?
+            command.reactions :
+            Object.keys(command.reactions))
+          .forEach(r => reactPromiseQueue.add(() => message.react(r)));
 
-    promiseQueue.resume();
+          reactPromiseQueue.resume();
+          return reactDone;
+        }));
+      }
 
-    return done;
-  }).then(() => Promise.resolve(channel)); 
-}
+      promiseQueue.resume();
 
-client.on('ready', () => {
-  logger.info(labels.welcome);
-  bot.outputChannel = client.channels.get(config.outputChannelId);
-  buildChannelCommands(config.dicePoolsChannelId, Object.keys(dicePools).map(key => {
-    return {
-      message: `__**${dicePools[key].name}**__`,
-      reactions: [key]
-    };
-  })).then(dicePoolsChannel => {
-    bot.dicePoolsChannel = dicePoolsChannel;
-    return buildChannelCommands(config.storytellerChannelId, commands).then(c => bot.storytellerChannel = c);
-  }); 
-});
+      return done;
+    }).then(() => Promise.resolve(channel));
+  }
 
-type RegExpAction = {
-  regex: RegExp,
-  action: (message: Message, matchArray: RegExpMatchArray[]) => void
-}
+  client.on('ready', () => {
+    logger.info(labels.welcome);
+    bot.outputChannel = client.channels.get(config.outputChannelId);
+    buildChannelCommands(config.dicePoolsChannelId, Object.keys(dicePools).map(key => {
+      return {
+        message: `__**${dicePools[key].name}**__`,
+        reactions: [key]
+      };
+    })).then(dicePoolsChannel => {
+      bot.dicePoolsChannel = dicePoolsChannel;
+      return buildChannelCommands(config.storytellerChannelId, commands).then(c => bot.storytellerChannel = c);
+    });
+  });
 
-type EmojiButton = {
-  emojis: { [key: string]: any },
-  button: (reaction: MessageReaction, value: any, scopes?: MessageScope[]) => void,
-  scopes?: MessageScope[]
-}
+  type RegExpAction = {
+    regex: RegExp,
+    action: (message: Message, matchArray: RegExpMatchArray[]) => void
+  }
 
-const regExpActions: RegExpAction[] = [
-  {
+  type EmojiButton = {
+    emojis: {
+      [key: string]: any
+    },
+    button: (reaction: MessageReaction, value: any, scopes ? : MessageScope[]) => void,
+    scopes ? : MessageScope[]
+  }
+
+  const regExpActions: RegExpAction[] = [{
     regex: /^%(?<dices>[1-9]?\d)\s*(\!(?<hunger>[1-5]))?\s*(\*(?<difficulty>[2-9]))?\s*(?<description>.*)/g,
     action: rollAction
-  }
-];
+  }];
 
-function buildEmojiButtons(defaultButtons: EmojiButton[]): EmojiButton[] {
+  function buildEmojiButtons(defaultButtons: EmojiButton[]): EmojiButton[] {
     const result = [];
 
     for (const command of commands) {
-      let emojis: { [key: string]: any };
+      let emojis: {
+        [key: string]: any
+      };
 
       if (Array.isArray(command.reactions)) {
         emojis = {};
@@ -113,59 +118,57 @@ function buildEmojiButtons(defaultButtons: EmojiButton[]): EmojiButton[] {
       result.push(button);
     }
 
-    return result;    
-}
+    return result;
+  }
 
-const emojiButtons: EmojiButton[] = buildEmojiButtons([
-  {
-    emojis: {
-      '1️⃣': 1,
-      '2️⃣': 2,
-      '3️⃣': 3
+  const emojiButtons: EmojiButton[] = buildEmojiButtons([{
+      emojis: {
+        '1️⃣': 1,
+        '2️⃣': 2,
+        '3️⃣': 3
+      },
+      button: reRollButton
     },
-    button: reRollButton
-  },
-  {
-    emojis: dicePools,
-    button: dicePoolButton
-  }
-]);
-
-client.on('message', (message: Message) => {
-  for(let regExpAction of regExpActions) {
-    let resultMatchAll = [...message.content.matchAll(regExpAction.regex)];
-    if (resultMatchAll.length > 0) {
-      logger.info(message.user.id, message.content, resultMatchAll);
-      regExpAction.action(message, resultMatchAll);
-      break;
+    {
+      emojis: dicePools,
+      button: dicePoolButton
     }
-  }
-});
+  ]);
 
-function emojiButtonEvent(isAdd: boolean, reaction: MessageReaction) {
-  if (!reaction.me) {
-    let name = <string> reaction.emoji.name;
-    for(let emojiButton of emojiButtons) {
-      let value = emojiButton.emojis[name];      
-      if (value && (emojiButton.scopes == undefined 
-      || bot.checkMessageScope(reaction, isAdd, emojiButton.scopes))) {
-        logger.info(name);
-        emojiButton.button(reaction, value, emojiButton.scopes);  
+  client.on('message', (message: Message) => {
+    for (let regExpAction of regExpActions) {
+      let resultMatchAll = [...message.content.matchAll(regExpAction.regex)];
+      if (resultMatchAll.length > 0) {
+        logger.info(message.user.id, message.content, resultMatchAll);
+        regExpAction.action(message, resultMatchAll);
         break;
       }
     }
+  });
+
+  function emojiButtonEvent(isAdd: boolean, reaction: MessageReaction) {
+    if (!reaction.me) {
+      let name = < string > reaction.emoji.name;
+      for (let emojiButton of emojiButtons) {
+        let value = emojiButton.emojis[name];
+        if (value && (emojiButton.scopes == undefined ||
+            bot.checkMessageScope(reaction, isAdd, emojiButton.scopes))) {
+          logger.info(name);
+          emojiButton.button(reaction, value, emojiButton.scopes);
+          break;
+        }
+      }
+    }
   }
-}
 
-client.on('messageReactionAdd', (reaction: MessageReaction) => { 
-  emojiButtonEvent(true, reaction);
-});
+  client.on('messageReactionAdd', (reaction: MessageReaction) => {
+    emojiButtonEvent(true, reaction);
+  });
 
-client.on('messageReactionRemove', (reaction: MessageReaction) => { 
-  emojiButtonEvent(false, reaction);
-});
+  client.on('messageReactionRemove', (reaction: MessageReaction) => {
+    emojiButtonEvent(false, reaction);
+  });
 
-googleSheets.auth().then(() => characterManager.load()).then(() => {
   discord.setToken(config.discordToken);
   client.login(config.discordToken);
 });

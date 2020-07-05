@@ -4,6 +4,9 @@ import { labels } from "./i18n/labels.ts";
 import { MessageReaction } from "katana/src/models/MessageReaction.ts";
 import { setDifficultyButton } from "./buttons/setDifficultyButton.ts";
 import { reloadCharactersButton } from "./buttons/reloadCharactersButton.ts";
+import { characterManager } from "./characterManager.ts";
+import { format } from "./utils/format.ts";
+import { changeCharacterButton } from "./buttons/changeCharacterButton.ts";
 
 export interface Command {
     message: string | MessageEmbed,
@@ -15,7 +18,7 @@ export interface CommandAction extends Command {
     button: (reaction: MessageReaction, value: any, scopes?: MessageScope[]) => void,
 }
 
-export const commands: CommandAction[] = [
+const defaultCommands: CommandAction[] = [
     {
         message: `__**${labels.commands.setDifficulty}**__`,
         reactions: {
@@ -38,4 +41,26 @@ export const commands: CommandAction[] = [
         scopes: [MessageScope.Storyteller, MessageScope.ReloadCharacters],
         button: reloadCharactersButton
     }
-]
+];
+
+export function buildCommands(): CommandAction[] {
+    const result: CommandAction[] = [];
+
+    for (const command of defaultCommands) {
+        result.push(command);
+    }
+    
+    for (const key in characterManager.characters) {
+        const character = characterManager.characters[key];
+        result.push({
+            message: `__**${format(labels.changeCharacterOption, character.name)}**__`,
+            reactions: {
+                '🧛': key
+            },
+            scopes: [MessageScope.Storyteller, MessageScope.ChangeCharacter],
+            button: changeCharacterButton
+        });
+    }
+
+    return result;
+}

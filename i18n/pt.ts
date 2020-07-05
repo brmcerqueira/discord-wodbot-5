@@ -5,6 +5,7 @@ export const pt: LabelsType = {
     authSuccess: "Autenticado com sucesso!",
     closeThisFlap: "Ok! Pode fechar essa aba.",
     welcome: "Wodbot 5.0 entrou!",
+    character: "Personagem",
     dices: "Dados",
     difficulty: "Dificuldade",
     successes: "Sucessos",
@@ -18,6 +19,8 @@ export const pt: LabelsType = {
     reRollHelperText: "Re-rolando {0} dado(s) da última jogada...",
     configNotFound: "Nenhum arquivo de configuração encontrado.",
     storytellerChangeDifficulty: "O narrador mudou a dificuldade.",
+    changeCharacterOption: "Mudar para o personsagem: {0}",
+    changeCharacterSuccess: "Novo personsagem selecionado.",
     dicePools: {
         attackWithFists: {
             name: "Ataque com os Punhos",

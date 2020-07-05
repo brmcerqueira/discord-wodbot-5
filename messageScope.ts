@@ -3,5 +3,6 @@ export enum MessageScope {
     RemoveEvent,
     Storyteller,
     SetDifficulty,
-    ReloadCharacters
+    ReloadCharacters,
+    ChangeCharacter,
 }
