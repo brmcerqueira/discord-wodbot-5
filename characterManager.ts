@@ -3,6 +3,8 @@ import { googleSheets } from "./googleSheets.ts";
 import PromiseQueue from "./utils/promiseQueue.ts";
 import { config } from "./config.ts";
 import { logger } from "./logger.ts";
+import { format } from "./utils/format.ts";
+import { labels } from "./i18n/labels.ts";
 
 export module characterManager {
     export const characters: {
@@ -134,9 +136,9 @@ export module characterManager {
     export function loadCharactersPromiseQueue(): PromiseQueue {
         let promiseQueue = new PromiseQueue();
 
-        const loadCharacter = (id: string) => promiseQueue.add(() => get(id).then(c => {
-            logger.info(c);
-            characters[id] = c;
+        const loadCharacter = (id: string) => promiseQueue.add(() => get(id).then(character => {
+            logger.info(format(labels.loadCharacterSuccess, character.name));
+            characters[id] = character;
         }))
 
         Object.values(config.playerCharacters).forEach(loadCharacter);

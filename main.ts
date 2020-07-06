@@ -139,7 +139,6 @@ googleSheets.auth().then(() => characterManager.load()).then(() => {
     for (let regExpAction of regExpActions) {
       let resultMatchAll = [...message.content.matchAll(regExpAction.regex)];
       if (resultMatchAll.length > 0) {
-        logger.info(message.user.id, message.content, resultMatchAll);
         regExpAction.action(message, resultMatchAll);
         break;
       }
@@ -152,8 +151,7 @@ googleSheets.auth().then(() => characterManager.load()).then(() => {
       for (let emojiButton of emojiButtons) {
         let value = emojiButton.emojis[name];
         if (value && (emojiButton.scopes == undefined ||
-            bot.checkMessageScope(reaction, isAdd, emojiButton.scopes))) {
-          logger.info(name);
+          bot.checkMessageScope(reaction, isAdd, emojiButton.scopes))) {
           emojiButton.button(reaction, value, emojiButton.scopes);
           break;
         }

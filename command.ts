@@ -7,6 +7,8 @@ import { reloadCharactersButton } from "./buttons/reloadCharactersButton.ts";
 import { characterManager } from "./characterManager.ts";
 import { format } from "./utils/format.ts";
 import { changeCharacterButton } from "./buttons/changeCharacterButton.ts";
+import { addExperienceButton } from "./buttons/addExperienceButton.ts";
+import { decreaseExperienceButton } from "./buttons/decreaseExperienceButton.ts";
 
 export interface Command {
     message: string | MessageEmbed,
@@ -19,6 +21,12 @@ export interface CommandAction extends Command {
 }
 
 const defaultCommands: CommandAction[] = [
+    {
+        message: `__**${labels.commands.reloadCharacters}**__`,
+        reactions: ['🔃'],
+        scopes: [MessageScope.Storyteller, MessageScope.ReloadCharacters],
+        button: reloadCharactersButton
+    },
     {
         message: `__**${labels.commands.setDifficulty}**__`,
         reactions: {
@@ -36,10 +44,36 @@ const defaultCommands: CommandAction[] = [
         button: setDifficultyButton
     },
     {
-        message: `__**${labels.commands.reloadCharacters}**__`,
-        reactions: ['🔃'],
-        scopes: [MessageScope.Storyteller, MessageScope.ReloadCharacters],
-        button: reloadCharactersButton
+        message: `__**${labels.addExperience}**__`,
+        reactions: {
+            '1️⃣': 1, 
+            '2️⃣': 2, 
+            '3️⃣': 3, 
+            '4️⃣': 4, 
+            '5️⃣': 5, 
+            '6️⃣': 6, 
+            '7️⃣': 7, 
+            '8️⃣': 8, 
+            '9️⃣': 9
+        },
+        scopes: [MessageScope.Storyteller, MessageScope.AddExperience],
+        button: addExperienceButton
+    },
+    {
+        message: `__**${labels.decreaseExperience}**__`,
+        reactions: {
+            '1️⃣': 1, 
+            '2️⃣': 2, 
+            '3️⃣': 3, 
+            '4️⃣': 4, 
+            '5️⃣': 5, 
+            '6️⃣': 6, 
+            '7️⃣': 7, 
+            '8️⃣': 8, 
+            '9️⃣': 9
+        },
+        scopes: [MessageScope.Storyteller, MessageScope.DecreaseExperience],
+        button: decreaseExperienceButton
     }
 ];
 

@@ -18,7 +18,6 @@ export module bot {
     } = {};
 
     export function checkMessageScope(reaction: MessageReaction, isAdd: boolean, scopes: MessageScope[]): boolean {
-        logger.info(reaction.message.id, scopes);
         for (const scope of scopes) {
             if ((scope == MessageScope.AddEvent && !isAdd)
             || (scope == MessageScope.RemoveEvent && isAdd)

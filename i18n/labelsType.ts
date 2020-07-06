@@ -8,7 +8,6 @@ export type LabelsType = {
     authSuccess: string,
     closeThisFlap: string,
     welcome: string,
-    character: string,
     dices: string,
     difficulty: string,
     successes: string,
@@ -24,6 +23,9 @@ export type LabelsType = {
     storytellerChangeDifficulty: string,
     changeCharacterOption: string,
     changeCharacterSuccess: string,
+    loadCharacterSuccess: string,
+    addExperience: string,
+    decreaseExperience: string,
     dicePools: {
         attackWithFists: DicePoolType
     },
