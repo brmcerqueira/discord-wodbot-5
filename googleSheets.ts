@@ -5,6 +5,8 @@ import { logger } from "./logger.ts";
 import { jsonResponse } from "./utils/jsonResponse.ts";
 
 export module googleSheets {
+    
+    const spreadSheetsApi = "https://sheets.googleapis.com/v4/spreadsheets";
     let token: any = null;
 
     export function auth(): Promise<void> {
@@ -62,11 +64,7 @@ export module googleSheets {
         });
     }
 
-    export enum ValuesBatchGetMajorDimension {
-        DimensionUnspecified,
-        Rows,
-        Columns
-    };
+    export type MajorDimensionType = "DIMENSION_UNSPECIFIED" | "ROWS" | "COLUMNS";
 
     export type ValuesBatchGetResult = { 
         spreadsheetId: string,
@@ -77,34 +75,49 @@ export module googleSheets {
         }[]
     };
 
-    export function valuesBatchGet(spreadSheetId: string, majorDimension: ValuesBatchGetMajorDimension, ranges: string[]): Promise<ValuesBatchGetResult> {               
-        let majorDimensionValue: string;
-        switch (majorDimension) {
-            case ValuesBatchGetMajorDimension.DimensionUnspecified:
-                majorDimensionValue = "DIMENSION_UNSPECIFIED"
-                break;
-            case ValuesBatchGetMajorDimension.Rows:
-                majorDimensionValue = "ROWS"
-                break;
-            case ValuesBatchGetMajorDimension.Columns:
-                majorDimensionValue = "COLUMNS"
-                break;                
-        }
+    export function valuesBatchGet(spreadSheetId: string, 
+        majorDimension: MajorDimensionType, 
+        ranges: string[]): Promise<ValuesBatchGetResult> {               
 
         let params = new URLSearchParams();
         params.append("key", config.googleSheets.apiKey);
-        params.append("majorDimension", majorDimensionValue);
+        params.append("majorDimension", majorDimension);
 
         for (const item of ranges) {
             params.append("ranges", item);
         }
         
-        return fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadSheetId}/values:batchGet?${params}`, { 
+        return fetch(`${spreadSheetsApi}/${spreadSheetId}/values:batchGet?${params}`, { 
             method: "GET",
             headers: {
                 Accept: "application/json",
                 Authorization: `Bearer ${token.access_token}`
             }
+        }).then(jsonResponse);
+    }
+
+    export type ValuesUpdateBody = {
+        majorDimension: MajorDimensionType,
+        values: any[][]
+    }
+
+    export function valuesUpdate(spreadSheetId: string, 
+        range: string, 
+        valueInputOption: "INPUT_VALUE_OPTION_UNSPECIFIED" | "RAW" | "USER_ENTERED", 
+        body: ValuesUpdateBody): Promise<any> {
+
+        let params = new URLSearchParams();
+        params.append("key", config.googleSheets.apiKey);
+        params.append("valueInputOption", valueInputOption);
+        
+        return fetch(`${spreadSheetsApi}/${spreadSheetId}/values/${encodeURI(range)}?${params}`, { 
+            method: "PUT",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token.access_token}`               
+            },
+            body: JSON.stringify(body)
         }).then(jsonResponse);
     }
 }

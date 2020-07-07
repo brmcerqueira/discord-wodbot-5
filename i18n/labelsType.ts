@@ -24,6 +24,7 @@ export type LabelsType = {
     changeCharacterOption: string,
     changeCharacterSuccess: string,
     loadCharacterSuccess: string,
+    updateExperienceSuccess: string,
     addExperience: string,
     decreaseExperience: string,
     dicePools: {

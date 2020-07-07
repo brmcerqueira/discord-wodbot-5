@@ -51,8 +51,7 @@ export module characterManager {
             ranges.push(value);
         }
 
-        return googleSheets.valuesBatchGet(id, 
-            googleSheets.ValuesBatchGetMajorDimension.Columns, ranges).then(data => {
+        return googleSheets.valuesBatchGet(id, "COLUMNS", ranges).then(data => {
                 let values = parseValues(data);
                 return {
                     name: values[binds.name][0],
@@ -162,5 +161,31 @@ export module characterManager {
         }
 
         return done;
+    }
+
+    export function updateExperience(id: string, update: (value: number) => number): Promise<void> {
+        return updateValue(id, binds.experienceTotal, update).then(exp => {
+            logger.info(format(labels.updateExperienceSuccess, characters[id].name, exp));
+        });
+    }
+
+    function updateValue(id: string, range: string, update: (value: number) => number): Promise<number> {
+        return googleSheets.valuesBatchGet(id, "ROWS", [range]).then(data => {
+            let value = 0;
+
+            for (const item of data.valueRanges) {
+                if (item.range == range) {
+                    value = item.values && item.values[0] && item.values[0][0] ? update(parseInt(item.values[0][0])) : 0;
+                    break;
+                }
+            }
+
+            return googleSheets.valuesUpdate(id, range, "USER_ENTERED", {
+                majorDimension: "ROWS",
+                values: [
+                    [value]
+                ]
+            }).then(() => value);
+        });
     }
 }

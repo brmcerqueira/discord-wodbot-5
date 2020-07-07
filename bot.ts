@@ -46,6 +46,6 @@ export module bot {
     export let storytellerChannel: TextChannel;
     export let outputChannel: TextChannel; 
 
-    export let storytellerSpreadSheetId: string | null = 
-        config.storytellerCharacters.length > 0 ? config.storytellerCharacters[0] : null;
+    export let storytellerSpreadSheetId: string = 
+        config.storytellerCharacters.length > 0 ? config.storytellerCharacters[0] : "";
 }

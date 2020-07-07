@@ -21,6 +21,7 @@ export const pt: LabelsType = {
     changeCharacterOption: "Mudar para o personagem: {0}",
     changeCharacterSuccess: "Novo personagem selecionado: {0}",
     loadCharacterSuccess: "Personagem atualizado: {0}",
+    updateExperienceSuccess: "O personagem '{0}' teve a experiência atualizada para: {1}",
     addExperience: "Aumentar experiência do personagem",
     decreaseExperience: "Remover experiência do personagem",
     dicePools: {
