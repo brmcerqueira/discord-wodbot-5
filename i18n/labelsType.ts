@@ -21,17 +21,17 @@ export type LabelsType = {
     reRollHelperText: string,
     configNotFound: string,
     storytellerChangeDifficulty: string,
-    changeCharacterOption: string,
     changeCharacterSuccess: string,
     loadCharacterSuccess: string,
     updateExperienceSuccess: string,
-    addExperience: string,
-    decreaseExperience: string,
     dicePools: {
         attackWithFists: DicePoolType
     },
     commands: {
         setDifficulty: string,
-        reloadCharacters: string
+        reloadCharacters: string,
+        addExperience: string,
+        decreaseExperience: string,
+        changeCharacterOption: string
     }
 }

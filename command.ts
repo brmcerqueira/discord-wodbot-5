@@ -44,7 +44,7 @@ const defaultCommands: CommandAction[] = [
         button: setDifficultyButton
     },
     {
-        message: `__**${labels.addExperience}**__`,
+        message: `__**${labels.commands.addExperience}**__`,
         reactions: {
             '1️⃣': 1, 
             '2️⃣': 2, 
@@ -60,7 +60,7 @@ const defaultCommands: CommandAction[] = [
         button: addExperienceButton
     },
     {
-        message: `__**${labels.decreaseExperience}**__`,
+        message: `__**${labels.commands.decreaseExperience}**__`,
         reactions: {
             '1️⃣': 1, 
             '2️⃣': 2, 
@@ -87,7 +87,7 @@ export function buildCommands(): CommandAction[] {
     for (const key in characterManager.characters) {
         const character = characterManager.characters[key];
         result.push({
-            message: `__**${format(labels.changeCharacterOption, character.name)}**__`,
+            message: `__**${format(labels.commands.changeCharacterOption, character.name)}**__`,
             reactions: {
                 '🧛': key
             },
