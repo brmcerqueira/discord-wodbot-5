@@ -1,8 +1,9 @@
-import { serve } from "http/server.ts";
+// deno-lint-ignore-file
 import { labels } from "./i18n/labels.ts";
 import { config } from "./config.ts";
 import { logger } from "./logger.ts";
 import { jsonResponse } from "./utils/jsonResponse.ts";
+import { serve } from "./deps.ts";
 
 export module googleSheets {
     
@@ -14,14 +15,15 @@ export module googleSheets {
             if (token) {
                 result(token);
             }
-            else {
-                async function codeHandle() {
-                    let httpServer = serve({ port: 3000 });
+            else {                 
+                async function handleHttp() {
+                    const conn = Deno.listen({ port: 3000 });
+                    const httpServer = Deno.serveHttp(await conn.accept());
             
-                    for await (let request of httpServer) {
-                        let urlSearchParams = new URLSearchParams(request.url.substring(1));
+                    for await (const event of httpServer) {
+                        let urlSearchParams = new URLSearchParams(event.request.url.substring(1));
                         if (urlSearchParams.has("code")) {
-                            request.respond({ status: 200, body: labels.closeThisFlap });
+                            event.respondWith(Response.json(labels.closeThisFlap));
                             let postParams = new URLSearchParams();
                             postParams.append("code", <string> urlSearchParams.get("code"));
                             postParams.append("grant_type", "authorization_code");
@@ -45,12 +47,12 @@ export module googleSheets {
                             });          
                         }
                         else {
-                            request.respond({ status: 404 });
+                            event.respondWith(Response.error());
                         }
                     }
                 }
             
-                codeHandle();
+                handleHttp();
             
                 let authParams = new URLSearchParams();
                 authParams.append("access_type", "offline");

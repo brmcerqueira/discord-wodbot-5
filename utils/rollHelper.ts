@@ -1,45 +1,45 @@
 import { roll } from "../diceRollManager.ts";
-import PromiseQueue from "../utils/promiseQueue.ts";
-import { rollMessageEmbed } from "../utils/rollMessageEmbed.ts";
-import { bot } from "../bot.ts";
-import { TextChannel } from "katana/mod.ts";
+import { botData } from "../botData.ts";
+import { Bot, transformEmbed } from "../deps.ts";
+import { rollEmbed } from "./rollEmbed.ts";
 
-export function rollHelper(channel: TextChannel, 
-    userId: string, 
+export async function rollHelper(bot: Bot, 
+    channelId: bigint, 
+    authorId: bigint, 
     dices: number, 
     hunger: number, 
     difficulty: number, 
-    description: string | undefined) {
+    description: string | undefined): Promise<void> {
 
-    if (bot.difficulty) {
-        difficulty = bot.difficulty;
-        bot.difficulty = null;
+    if (botData.difficulty) {
+        difficulty = botData.difficulty;
+        botData.difficulty = null;
     }
 
-    let result = roll(dices, hunger, difficulty);
+    const result = roll(dices, hunger, difficulty);
 
-    channel.send(rollMessageEmbed(result, userId, description)).then(rollMessage => {
-        bot.lastRolls[userId] = {
-            messageId: rollMessage.id,
-            result: result
-        };
+    const rollMessage = await bot.helpers.sendMessage(channelId, {
+        embeds: [transformEmbed(bot, rollEmbed(result, authorId, description))]
+    })
+
+    botData.lastRolls[authorId.toString()] = {
+        messageId: rollMessage.id,
+        result: result
+    };
+    
+    const margin = dices - hunger;
+
+    if (margin > 0) {
+        const reactions = ['1️⃣'];
+  
+        if (margin >= 2) { 
+            reactions.push('2️⃣');   
+        } 
         
-        let margin = dices - hunger;
+        if (margin >= 3) { 
+            reactions.push('3️⃣');
+        }
 
-        if (margin > 0) {
-            let promiseQueue = new PromiseQueue();
-                     
-            promiseQueue.add(() => rollMessage.react('1️⃣'));
-
-            if (margin >= 2) {    
-                promiseQueue.add(() => rollMessage.react('2️⃣'));
-            } 
-            
-            if (margin >= 3) { 
-                promiseQueue.add(() => rollMessage.react('3️⃣'));  
-            }
-
-            promiseQueue.resume();
-        }           
-    }); 
+        await bot.helpers.addReactions(channelId, channelId, reactions);
+    }
 }

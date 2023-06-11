@@ -1,7 +1,5 @@
-import { MessageEmbed } from "katana/mod.ts";
 import { MessageScope } from "./messageScope.ts";
 import { labels } from "./i18n/labels.ts";
-import { MessageReaction } from "katana/src/models/MessageReaction.ts";
 import { setDifficultyButton } from "./buttons/setDifficultyButton.ts";
 import { reloadCharactersButton } from "./buttons/reloadCharactersButton.ts";
 import { characterManager } from "./characterManager.ts";
@@ -9,15 +7,17 @@ import { format } from "./utils/format.ts";
 import { changeCharacterButton } from "./buttons/changeCharacterButton.ts";
 import { addExperienceButton } from "./buttons/addExperienceButton.ts";
 import { decreaseExperienceButton } from "./buttons/decreaseExperienceButton.ts";
+import { MessageReaction } from "./messageReaction.ts";
+import { Bot, DiscordEmbed } from "./deps.ts";
 
 export interface Command {
-    message: string | MessageEmbed,
+    message: string | DiscordEmbed,
     reactions: string[] | { [key: string]: any },
     scopes?: MessageScope[]
 }
 
 export interface CommandAction extends Command {
-    button: (reaction: MessageReaction, value: any, scopes?: MessageScope[]) => void,
+    button: (bot: Bot, reaction: MessageReaction, value: any, scopes?: MessageScope[]) => void,
 }
 
 const defaultCommands: CommandAction[] = [

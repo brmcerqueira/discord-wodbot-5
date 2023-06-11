@@ -1,8 +1,0 @@
-{
-   "imports": {
-      "log4deno/": "https://deno.land/x/log4deno/",
-      "config/": "https://deno.land/x/config/",
-      "katana/": "https://deno.land/x/katana/",
-      "http/": "https://deno.land/std@0.59.0/http/"
-   }
-}

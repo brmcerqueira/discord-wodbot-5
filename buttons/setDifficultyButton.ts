@@ -1,13 +1,21 @@
-import { MessageReaction } from "katana/src/models/MessageReaction.ts";
-import { MessageEmbed } from "katana/mod.ts";
-import { bot } from "../bot.ts";
+import { botData } from "../botData.ts";
+import { config } from "../config.ts";
+import { Bot, transformEmbed } from "../deps.ts";
 import { labels } from "../i18n/labels.ts";
+import { MessageReaction } from "../messageReaction.ts";
 
-export function setDifficultyButton(reaction: MessageReaction, difficulty: number) {
-    bot.difficulty = difficulty;  
-    bot.outputChannel.send(new MessageEmbed()
-    .setTitle(labels.storytellerChangeDifficulty)
-    .addField(labels.difficulty, `**${bot.difficulty}**`, true)
-    //Cinza
-    .setColor(9807270)); 
+export function setDifficultyButton(bot: Bot, reaction: MessageReaction, difficulty: number) {
+    botData.difficulty = difficulty;  
+    bot.helpers.sendMessage(config.outputChannelId, {
+        embeds: [transformEmbed(bot, {
+            title: labels.storytellerChangeDifficulty,
+            //Cinza
+            color: 9807270,
+            fields: [{
+                name: labels.difficulty,
+                value: `**${botData.difficulty}**`,
+                inline: true
+            }]
+        })]
+    })
 }

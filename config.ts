@@ -1,14 +1,13 @@
-import { Config } from "config/mod.ts";
+
 import { logger } from "./logger.ts";
 import { labels } from "./i18n/labels.ts";
 
 export type ConfigDef = {
     discordToken: string,
-    storytellerId: string,
-    dicePoolsChannelId: string,
-    storytellerChannelId: string,
-    outputChannelId: string,
-    characterLoadInterval?: number,
+    storytellerId: bigint,
+    dicePoolsChannelId: bigint,
+    storytellerChannelId: bigint,
+    outputChannelId: bigint,
     googleSheets: {
         clientId: string,
         clientSecret: string,
@@ -20,10 +19,10 @@ export type ConfigDef = {
     storytellerCharacters: string[]
 }
 
-export const config: ConfigDef = <ConfigDef> await Config.load({
-    file: 'default'
-});
+const path = Deno.env.get("DISCORD_WODBOT_CONFIG_PATH");
 
-if (!config) {
+if (!path) {
     logger.info(labels.configNotFound);
 }
+
+export const config: ConfigDef = <ConfigDef> JSON.parse(await Deno.readTextFile(<string>path));

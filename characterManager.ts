@@ -1,6 +1,6 @@
+// deno-lint-ignore-file
 import { Character } from "./character.ts";
 import { googleSheets } from "./googleSheets.ts";
-import PromiseQueue from "./utils/promiseQueue.ts";
 import { config } from "./config.ts";
 import { logger } from "./logger.ts";
 import { format } from "./utils/format.ts";
@@ -132,35 +132,20 @@ export module characterManager {
             });
     }
 
-    export function loadCharactersPromiseQueue(): PromiseQueue {
-        let promiseQueue = new PromiseQueue();
-
-        const loadCharacter = (id: string) => promiseQueue.add(() => get(id).then(character => {
-            logger.info(format(labels.loadCharacterSuccess, character.name));
-            characters[id] = character;
-        }))
-
-        Object.values(config.playerCharacters).forEach(loadCharacter);
-
-        for (const id of config.storytellerCharacters) {
-            loadCharacter(id);
-        }
-
-        return promiseQueue;
+    async function loadCharacter(id: string) { 
+        const character = await get(id);
+        logger.info(format(labels.loadCharacterSuccess, character.name));
+        characters[id] = character;
     }
 
-    export function load(): Promise<void> {
-        let promiseQueue = loadCharactersPromiseQueue();
-        let done = promiseQueue.done;
-        promiseQueue.resume();
-
-        if (config.characterLoadInterval) {
-            setInterval(() => {
-                loadCharactersPromiseQueue().resume();
-            }, config.characterLoadInterval);
+    export async function load(): Promise<void> {
+        for (const id of Object.values(config.playerCharacters)) {
+            await loadCharacter(id);
         }
 
-        return done;
+        for (const id of config.storytellerCharacters) {
+            await loadCharacter(id);
+        }
     }
 
     export function updateExperience(id: string, update: (value: number) => number): Promise<void> {
