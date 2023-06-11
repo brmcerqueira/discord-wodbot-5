@@ -1,4 +1,4 @@
-import { createBot, Intents, startBot, Message, Bot, DiscordEmbed, transformEmbed } from "./deps.ts";
+import { createBot, Intents, startBot, Message, Bot, DiscordEmbed, transformEmbed, GatewayIntents } from "./deps.ts";
 import { labels } from "./i18n/labels.ts";
 import { config } from "./config.ts";
 import { reRollButton } from "./buttons/reRollButton.ts";
@@ -117,7 +117,7 @@ function emojiButtonEvent(isAdd: boolean, bot: Bot, reaction: MessageReaction) {
 
 await startBot(createBot({
   token: config.discordToken,
-  intents: Intents.Guilds | Intents.GuildMessages,
+  intents: Intents.Guilds | Intents.GuildMessages | Intents.MessageContent,
   events: {
     ready(bot: Bot) { 
       logger.info(labels.welcome);

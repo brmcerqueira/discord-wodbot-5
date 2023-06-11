@@ -21,11 +21,11 @@ export module googleSheets {
                     const httpServer = Deno.serveHttp(await conn.accept());
             
                     for await (const event of httpServer) {
-                        let urlSearchParams = new URLSearchParams(event.request.url.substring(1));
-                        if (urlSearchParams.has("code")) {
-                            event.respondWith(Response.json(labels.closeThisFlap));
-                            let postParams = new URLSearchParams();
-                            postParams.append("code", <string> urlSearchParams.get("code"));
+                        const url = new URL(event.request.url);
+                        if (url.searchParams.has("code")) {
+                            await event.respondWith(Response.json(labels.closeThisFlap, { status: 200 }));
+                            const postParams = new URLSearchParams();
+                            postParams.append("code", <string> url.searchParams.get("code"));
                             postParams.append("grant_type", "authorization_code");
                             postParams.append("client_id", config.googleSheets.clientId);
                             postParams.append("client_secret", config.googleSheets.clientSecret);
@@ -39,6 +39,7 @@ export module googleSheets {
                                 body: postParams
                             }).then(jsonResponse).then(data => {
                                 httpServer.close();
+                                conn.close();
                                 token = data;
                                 logger.info(labels.authSuccess);
                                 result();
@@ -47,7 +48,7 @@ export module googleSheets {
                             });          
                         }
                         else {
-                            event.respondWith(Response.error());
+                            await event.respondWith(Response.json({}, { status: 404 }));
                         }
                     }
                 }
