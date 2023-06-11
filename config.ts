@@ -24,5 +24,8 @@ const path = Deno.env.get("DISCORD_WODBOT_CONFIG_PATH");
 if (!path) {
     logger.info(labels.configNotFound);
 }
+else {
+    logger.info(path);
+}
 
 export const config: ConfigDef = <ConfigDef> JSON.parse(await Deno.readTextFile(<string>path));
