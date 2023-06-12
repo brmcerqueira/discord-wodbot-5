@@ -1,11 +1,10 @@
 import { roll } from "../diceRollManager.ts";
 import { botData } from "../botData.ts";
-import { Bot, transformEmbed } from "../deps.ts";
+import { TextChannel } from "../deps.ts";
 import { rollEmbed } from "./rollEmbed.ts";
 
-export async function rollHelper(bot: Bot, 
-    channelId: bigint, 
-    authorId: bigint, 
+export async function rollHelper(channel: TextChannel, 
+    authorId: string, 
     dices: number, 
     hunger: number, 
     difficulty: number, 
@@ -18,28 +17,26 @@ export async function rollHelper(bot: Bot,
 
     const result = roll(dices, hunger, difficulty);
 
-    const rollMessage = await bot.helpers.sendMessage(channelId, {
-        embeds: [transformEmbed(bot, rollEmbed(result, authorId, description))]
+    const message = await channel.send({
+        embeds: [rollEmbed(result, authorId, description)]
     })
 
     botData.lastRolls[authorId.toString()] = {
-        messageId: rollMessage.id,
+        messageId: message.id,
         result: result
     };
     
     const margin = dices - hunger;
 
     if (margin > 0) {
-        const reactions = ['1️⃣'];
+        await message.addReaction('1️⃣');
   
         if (margin >= 2) { 
-            reactions.push('2️⃣');   
+            await message.addReaction('2️⃣');   
         } 
         
         if (margin >= 3) { 
-            reactions.push('3️⃣');
+            await message.addReaction('3️⃣');
         }
-
-        await bot.helpers.addReactions(channelId, channelId, reactions);
     }
 }

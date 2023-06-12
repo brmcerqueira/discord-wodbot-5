@@ -1,4 +1,4 @@
-import { createBot, Intents, startBot, Message, Bot, DiscordEmbed, transformEmbed, GatewayIntents } from "./deps.ts";
+import { Client, Embed, GatewayIntents, Message, MessageReaction, TextChannel, User } from "./deps.ts";
 import { labels } from "./i18n/labels.ts";
 import { config } from "./config.ts";
 import { reRollButton } from "./buttons/reRollButton.ts";
@@ -11,46 +11,63 @@ import { botData } from "./botData.ts";
 import { characterManager } from "./characterManager.ts";
 import { MessageScope } from "./messageScope.ts";
 import { Command, buildCommands } from "./command.ts";
-import { MessageReaction } from "./messageReaction.ts";
 
 await googleSheets.auth();
 await characterManager.load();
 
 const commands = buildCommands();
 
-async function buildChannelCommands(bot: Bot, channelId: bigint, commands: Command[]): Promise<void> {
-  const allMessages = await bot.helpers.getMessages(channelId);
+const client = new Client({
+  token: config.discordToken,
+  intents:  [
+    GatewayIntents.GUILDS,
+    GatewayIntents.GUILD_MESSAGES,
+    GatewayIntents.DIRECT_MESSAGES
+  ]
+})
 
-  if (allMessages.size > 0) {
-    await bot.helpers.deleteMessages(channelId, allMessages.map(m => m.id));
+async function buildChannelCommands(channelId: string, commands: Command[]): Promise<void> {
+  const channel = <TextChannel> await client.channels.get<TextChannel>(channelId);
+  const allMessages = await client.rest.endpoints.getChannelMessages(channelId);
+
+  switch (allMessages.length) {
+    case 0:
+      break;
+    case 1:
+      await client.rest.endpoints.deleteMessage(channelId, allMessages[0].id);
+      break;
+    default:
+      await client.rest.endpoints.bulkDeleteMessages(channelId, allMessages.map(m => m.id));
+      break;
   }
 
   for (const command of commands) {
-    const message = await bot.helpers.sendMessage(channelId, typeof command.message == "string" ? {
+    const message = await channel.send(channelId, typeof command.message == "string" ? {
       content: <string>command.message
     }: {
-      embeds: [transformEmbed(bot, <DiscordEmbed>command.message)]
+      embeds: [<Embed>command.message]
     });
 
     if (command.scopes) {
       botData.addMessageScope(message.id, command.scopes);
     }
 
-    await bot.helpers.addReactions(channelId, message.id, (Array.isArray(command.reactions) ?
-      command.reactions : Object.keys(command.reactions)));
+    for (const reaction of (Array.isArray(command.reactions) ? <string[]> command.reactions : Object.keys(command.reactions))) {
+      await message.addReaction(reaction);
+    }
   }
 }
 
 type RegExpAction = {
   regex: RegExp,
-  action: (bot: Bot, message: Message, matchArray: RegExpMatchArray[]) => void
+  action: (message: Message, matchArray: RegExpMatchArray[]) => Promise<void>
 }
 
 type EmojiButton = {
   emojis: {
     [key: string]: any
   },
-  button: (bot:Bot, reaction: MessageReaction, value: any, scopes ? : MessageScope[]) => void,
+  button: (reaction: MessageReaction, value: any, scopes ? : MessageScope[]) => Promise<void>,
   scopes ? : MessageScope[]
 }
 
@@ -103,47 +120,46 @@ const emojiButtons: EmojiButton[] = buildEmojiButtons([{
   }
 ]);
 
-function emojiButtonEvent(isAdd: boolean, bot: Bot, reaction: MessageReaction) {
+async function emojiButtonEvent(isAdd: boolean, reaction: MessageReaction) {
   const name = <string> reaction.emoji.name;
   for (const emojiButton of emojiButtons) {
     const value = emojiButton.emojis[name];
     if (value && (emojiButton.scopes == undefined ||
-      botData.checkMessageScope(reaction, isAdd, emojiButton.scopes))) {
-      emojiButton.button(bot, reaction, value, emojiButton.scopes);
+      await botData.checkMessageScope(reaction, isAdd, emojiButton.scopes))) {
+      await emojiButton.button(reaction, value, emojiButton.scopes);
       break;
     }
   }
 }
 
-await startBot(createBot({
-  token: config.discordToken,
-  intents: Intents.Guilds | Intents.GuildMessages | Intents.MessageContent,
-  events: {
-    ready(bot: Bot) { 
-      logger.info(labels.welcome);
-      buildChannelCommands(bot, config.dicePoolsChannelId, Object.keys(dicePools).map(key => {
-        return {
-          message: `__**${dicePools[key].name}**__`,
-          reactions: [key]
-        };
-      })).then(() => {
-        buildChannelCommands(bot, config.storytellerChannelId, commands);
-      });
-    },
-    messageCreate(bot: Bot, message: Message) {
-      for (const regExpAction of regExpActions) {
-        const resultMatchAll = [...message.content.matchAll(regExpAction.regex)];
-        if (resultMatchAll.length > 0) {
-          regExpAction.action(bot, message, resultMatchAll);
-          break;
-        }
-      }
-    },
-    reactionAdd(bot: Bot, reaction: MessageReaction) {
-      emojiButtonEvent(true, bot, reaction);
-    },
-    reactionRemove(bot: Bot, reaction: MessageReaction) {
-      emojiButtonEvent(false, bot, reaction);  
+client.on('ready', async () => {
+  logger.info(labels.welcome);
+  botData.outputChannel = <TextChannel> await client.channels.get<TextChannel>(config.outputChannelId);
+  await buildChannelCommands(config.dicePoolsChannelId, Object.keys(dicePools).map(key => {
+    return {
+      message: `__**${dicePools[key].name}**__`,
+      reactions: [key]
+    };
+  }));
+  await buildChannelCommands(config.storytellerChannelId, commands);
+});
+
+client.on('messageCreate', async (message: Message) => {
+  for (const regExpAction of regExpActions) {
+    const resultMatchAll = [...message.content.matchAll(regExpAction.regex)];
+    if (resultMatchAll.length > 0) {
+      await regExpAction.action(message, resultMatchAll);
+      break;
     }
-  },
-}));
+  }
+});
+
+client.on('messageReactionAdd', async (reaction: MessageReaction, user: User) => {
+  await emojiButtonEvent(true, reaction);
+});
+
+client.on('messageReactionRemove', async (reaction: MessageReaction, user: User) => {
+  await emojiButtonEvent(false, reaction);  
+});
+
+client.connect();

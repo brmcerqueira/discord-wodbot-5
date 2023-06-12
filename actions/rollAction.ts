@@ -1,12 +1,12 @@
-import { Bot, Message } from "../deps.ts";
+import { Message } from "../deps.ts";
 import { rollHelper } from "../utils/rollHelper.ts";
 
-export function rollAction(bot: Bot, message: Message, matchArray: RegExpMatchArray[]) {
+export async function rollAction(message: Message, matchArray: RegExpMatchArray[]) {
     for(const match of matchArray) {
         if (match.groups) {
-            rollHelper(bot,
-                message.channelId, 
-                message.authorId, 
+            await rollHelper(
+                message.channel, 
+                message.author.id, 
                 parseInt(match.groups.dices), 
                 match.groups.hunger ? parseInt(match.groups.hunger) : 0, 
                 match.groups.difficulty ? parseInt(match.groups.difficulty) : 1, 

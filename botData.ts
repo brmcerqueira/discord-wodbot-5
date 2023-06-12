@@ -2,13 +2,12 @@
 import { RollResult } from "./diceRollManager.ts";
 import { config } from "./config.ts";
 import { MessageScope } from "./messageScope.ts";
-import { Channel } from "./deps.ts";
-import { MessageReaction } from "./messageReaction.ts";
+import { MessageReaction, TextChannel } from "./deps.ts";
 
 export module botData {
     export const lastRolls: {
         [userId: string]: {
-            messageId: bigint,
+            messageId: string,
             result: RollResult
         }
     } = {};
@@ -17,28 +16,30 @@ export module botData {
         [messageId: string]: MessageScope[]
     } = {};
 
-    export function checkMessageScope(reaction: MessageReaction, isAdd: boolean, scopes: MessageScope[]): boolean {
+    export async function checkMessageScope(reaction: MessageReaction, isAdd: boolean, scopes: MessageScope[]): Promise<boolean> {
         for (const scope of scopes) {
             if ((scope == MessageScope.AddEvent && !isAdd)
             || (scope == MessageScope.RemoveEvent && isAdd)
-            || (scope == MessageScope.Storyteller && reaction.userId != config.storytellerId)
+            || (scope == MessageScope.Storyteller && (await reaction.users.get(config.storytellerId)) != undefined)
             || ((scope != MessageScope.AddEvent 
                 && scope != MessageScope.RemoveEvent 
                 && scope != MessageScope.Storyteller) 
-                && (!scopeMessages[reaction.messageId.toString()] || (scopeMessages[reaction.messageId.toString()] 
-                && scopeMessages[reaction.messageId.toString()].indexOf(scope) == -1)))) {
+                && (!scopeMessages[reaction.message.id] || (scopeMessages[reaction.message.id] 
+                && scopeMessages[reaction.message.id].indexOf(scope) == -1)))) {
                 return false;
             }          
         }
         return true;
     }
 
-    export function addMessageScope(messageId: bigint, scopes: MessageScope[]): void {
-        if (!scopeMessages[messageId.toString()]) {
-            scopeMessages[messageId.toString()] = [];
+    export function addMessageScope(messageId: string, scopes: MessageScope[]): void {
+        if (!scopeMessages[messageId]) {
+            scopeMessages[messageId] = [];
         }
-        scopes.forEach(s => scopeMessages[messageId.toString()].push(s));
+        scopes.forEach(s => scopeMessages[messageId].push(s));
     }
+
+    export let outputChannel: TextChannel;
 
     export let difficulty: number | null = null;
 

@@ -4,10 +4,10 @@ import { labels } from "./i18n/labels.ts";
 
 export type ConfigDef = {
     discordToken: string,
-    storytellerId: bigint,
-    dicePoolsChannelId: bigint,
-    storytellerChannelId: bigint,
-    outputChannelId: bigint,
+    storytellerId: string,
+    dicePoolsChannelId: string,
+    storytellerChannelId: string,
+    outputChannelId: string,
     googleSheets: {
         clientId: string,
         clientSecret: string,

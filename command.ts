@@ -7,17 +7,16 @@ import { format } from "./utils/format.ts";
 import { changeCharacterButton } from "./buttons/changeCharacterButton.ts";
 import { addExperienceButton } from "./buttons/addExperienceButton.ts";
 import { decreaseExperienceButton } from "./buttons/decreaseExperienceButton.ts";
-import { MessageReaction } from "./messageReaction.ts";
-import { Bot, DiscordEmbed } from "./deps.ts";
+import { Embed, MessageReaction } from "./deps.ts";
 
 export interface Command {
-    message: string | DiscordEmbed,
+    message: string | Embed,
     reactions: string[] | { [key: string]: any },
     scopes?: MessageScope[]
 }
 
 export interface CommandAction extends Command {
-    button: (bot: Bot, reaction: MessageReaction, value: any, scopes?: MessageScope[]) => void,
+    button: (reaction: MessageReaction, value: any, scopes?: MessageScope[]) => Promise<void>,
 }
 
 const defaultCommands: CommandAction[] = [

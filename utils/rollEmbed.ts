@@ -1,9 +1,9 @@
 import { RollResult, RollStatus } from "../diceRollManager.ts";
 import { labels } from "../i18n/labels.ts";
-import { DiscordEmbed } from "../deps.ts";
+import { Embed, EmbedPayload } from "../deps.ts";
 
-export function rollEmbed(result: RollResult, authorId: bigint, title?: string): DiscordEmbed {
-    const embed: DiscordEmbed = {};
+export function rollEmbed(result: RollResult, authorId: string, title?: string): Embed {
+    const embed: EmbedPayload = {};
 
     if (title) {
         embed.title = title;
@@ -63,5 +63,5 @@ export function rollEmbed(result: RollResult, authorId: bigint, title?: string):
         inline: true
     }];
 
-    return embed;
+    return new Embed(embed);
 }
