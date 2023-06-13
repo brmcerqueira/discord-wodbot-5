@@ -28,7 +28,7 @@ const client = new Client({
     GatewayIntents.DIRECT_MESSAGE_REACTIONS,
     GatewayIntents.MESSAGE_CONTENT,
   ]
-})
+});
 
 async function buildChannelCommands(channelId: string, commands: Command[]): Promise<void> {
   const channel = <TextChannel>await client.channels.get<TextChannel>(channelId);
@@ -144,28 +144,29 @@ client.on('ready', async () => {
     };
   }));
   await buildChannelCommands(config.storytellerChannelId, commands);
-  logger.info(labels.welcome);
-});
 
-client.on('messageCreate', async (message: Message) => {
-  if (!message.author.bot) {
-    logger.info(labels.log.messageCreateEvent, message.content);
-    for (const regExpAction of regExpActions) {
-      const resultMatchAll = [...message.content.matchAll(regExpAction.regex)];
-      if (resultMatchAll.length > 0) {
-        await regExpAction.action(message, resultMatchAll);
-        break;
+  client.on('messageCreate', async (message: Message) => {
+    if (!message.author.bot) {
+      logger.info(labels.log.messageCreateEvent, message.content);
+      for (const regExpAction of regExpActions) {
+        const resultMatchAll = [...message.content.matchAll(regExpAction.regex)];
+        if (resultMatchAll.length > 0) {
+          await regExpAction.action(message, resultMatchAll);
+          break;
+        }
       }
     }
-  }
-});
+  });
+  
+  client.on('messageReactionAdd', async (reaction: MessageReaction, user: User) => {
+    await emojiButtonEvent(true, reaction, user);
+  });
+  
+  client.on('messageReactionRemove', async (reaction: MessageReaction, user: User) => {
+    await emojiButtonEvent(false, reaction, user);
+  });
 
-client.on('messageReactionAdd', async (reaction: MessageReaction, user: User) => {
-  await emojiButtonEvent(true, reaction, user);
-});
-
-client.on('messageReactionRemove', async (reaction: MessageReaction, user: User) => {
-  await emojiButtonEvent(false, reaction, user);
+  logger.info(labels.welcome);
 });
 
 client.connect();
