@@ -21,6 +21,7 @@ export const pt: LabelsType = {
     changeCharacterSuccess: "Novo personagem selecionado: %v",
     loadCharacterSuccess: "Personagem atualizado: %v",
     updateExperienceSuccess: "O personagem '%v' teve a experiência atualizada para: %v",
+    updateHungerSuccess: "O personagem '%v' teve a fome atualizada para: %v",
     jsonResponseError: "Http Error: %v %v %v %v",
     loading: "Carregando...",
     dicePools: {
@@ -34,7 +35,8 @@ export const pt: LabelsType = {
         reloadCharacters: "Recarregar personagens",
         addExperience: "Aumentar experiência do personagem",
         decreaseExperience: "Remover experiência do personagem",
-        changeCharacterOption: "Mudar para o personagem: %v"
+        changeCharacterOption: "Mudar para o personagem: %v",
+        setHunger: "Ajustar fome do personagem"
     },
     log: {
         emojiButtonEvent: "Emoji: %v - Message: %v - IsAdd: %v - Count: %v",

@@ -17,6 +17,6 @@ export const willpower = `${attributes}!J17:J19`;
 export const humanity = `${attributes}!J21:J22`;
 
 export const bloodPotency = `${attributes}!D15`;
-export const hunger = `${attributes}!M17`;
+export const hunger = `${attributes}!M12`;
 export const experienceTotal = `${attributes}!L7`;
 export const experienceSpent = `${attributes}!L5`;

@@ -122,12 +122,17 @@ export async function load(): Promise<void> {
     }
 }
 
+
+
 export async function updateExperience(id: string, update: (value: number) => number): Promise<void> {
-    const experience = await updateValue(id, binds.experienceTotal, update);
-    logger.info(labels.updateExperienceSuccess, characters[id].name, experience)
+    await updateValue(id, binds.experienceTotal, labels.updateExperienceSuccess, update);
 }
 
-async function updateValue(id: string, range: string, update: (value: number) => number): Promise<number> {
+export async function updateHunger(id: string, update: (value: number) => number): Promise<void> {
+    await updateValue(id, binds.hunger, labels.updateHungerSuccess, update);
+}
+
+async function updateValue(id: string, range: string, label: string, update: (value: number) => number): Promise<void> {
     const data = await googleSheets.valuesBatchGet(id, "ROWS", [range]);
     let value = 0;
 
@@ -143,5 +148,5 @@ async function updateValue(id: string, range: string, update: (value: number) =>
         values: [[value]]
     });
 
-    return value;
+    logger.info(label, characters[id].name, value);
 }

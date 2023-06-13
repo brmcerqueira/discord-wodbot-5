@@ -24,6 +24,7 @@ export type LabelsType = {
     changeCharacterSuccess: string,
     loadCharacterSuccess: string,
     updateExperienceSuccess: string,
+    updateHungerSuccess: string,
     jsonResponseError: string,
     loading: string,
     dicePools: {
@@ -34,7 +35,8 @@ export type LabelsType = {
         reloadCharacters: string,
         addExperience: string,
         decreaseExperience: string,
-        changeCharacterOption: string
+        changeCharacterOption: string,
+        setHunger: string
     },
     log: {
         emojiButtonEvent: string,

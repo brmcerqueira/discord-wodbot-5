@@ -6,5 +6,6 @@ export enum MessageScope {
     ReloadCharacters,
     ChangeCharacter,
     AddExperience,
-    DecreaseExperience
+    DecreaseExperience,
+    SetHunger
 }

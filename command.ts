@@ -7,6 +7,7 @@ import { changeCharacterButton } from "./buttons/changeCharacterButton.ts";
 import { addExperienceButton } from "./buttons/addExperienceButton.ts";
 import { decreaseExperienceButton } from "./buttons/decreaseExperienceButton.ts";
 import { Embed, MessageReaction, User, sprintf } from "./deps.ts";
+import { setHungerButton } from "./buttons/setHungerButton.ts";
 
 export type CommandButton = (reaction: MessageReaction, user: User, value: any, scopes ? : MessageScope[]) => Promise<void>
 
@@ -74,6 +75,19 @@ const defaultCommands: CommandAction[] = [
         },
         scopes: [MessageScope.Storyteller, MessageScope.DecreaseExperience],
         button: decreaseExperienceButton
+    },
+    {
+        message: `__**${labels.commands.setHunger}**__`,
+        reactions: {
+            '0️⃣': 0,
+            '1️⃣': 1, 
+            '2️⃣': 2, 
+            '3️⃣': 3, 
+            '4️⃣': 4, 
+            '5️⃣': 5
+        },
+        scopes: [MessageScope.Storyteller, MessageScope.SetHunger],
+        button: setHungerButton
     }
 ];
 
