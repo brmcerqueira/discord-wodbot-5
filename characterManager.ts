@@ -3,7 +3,6 @@ import { Character } from "./character.ts";
 import { googleSheets } from "./googleSheets.ts";
 import { config } from "./config.ts";
 import { logger } from "./logger.ts";
-import { format } from "./utils/format.ts";
 import { labels } from "./i18n/labels.ts";
 
 export module characterManager {
@@ -134,7 +133,7 @@ export module characterManager {
 
     async function loadCharacter(id: string) { 
         const character = await get(id);
-        logger.info(format(labels.loadCharacterSuccess, character.name));
+        logger.info(labels.loadCharacterSuccess, character.name);
         characters[id] = character;
     }
 
@@ -150,7 +149,7 @@ export module characterManager {
 
     export function updateExperience(id: string, update: (value: number) => number): Promise<void> {
         return updateValue(id, binds.experienceTotal, update).then(exp => {
-            logger.info(format(labels.updateExperienceSuccess, characters[id].name, exp));
+            logger.info(labels.updateExperienceSuccess, characters[id].name, exp);
         });
     }
 

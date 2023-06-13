@@ -24,6 +24,7 @@ export type LabelsType = {
     changeCharacterSuccess: string,
     loadCharacterSuccess: string,
     updateExperienceSuccess: string,
+    jsonResponseError: string,
     dicePools: {
         attackWithFists: DicePoolType
     },
@@ -33,5 +34,9 @@ export type LabelsType = {
         addExperience: string,
         decreaseExperience: string,
         changeCharacterOption: string
+    },
+    log: {
+        emojiButtonEvent: string,
+        messageCreateEvent: string
     }
 }

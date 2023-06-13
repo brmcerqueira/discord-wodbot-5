@@ -10,7 +10,7 @@ import { rollAction } from "./actions/rollAction.ts";
 import { botData } from "./botData.ts";
 import { characterManager } from "./characterManager.ts";
 import { MessageScope } from "./messageScope.ts";
-import { Command, buildCommands } from "./command.ts";
+import { Command, CommandButton, buildCommands } from "./command.ts";
 
 await googleSheets.auth();
 await characterManager.load();
@@ -22,7 +22,11 @@ const client = new Client({
   intents:  [
     GatewayIntents.GUILDS,
     GatewayIntents.GUILD_MESSAGES,
-    GatewayIntents.DIRECT_MESSAGES
+    GatewayIntents.GUILD_MESSAGE_REACTIONS,
+    GatewayIntents.GUILD_MESSAGE_REACTIONS,
+    GatewayIntents.DIRECT_MESSAGES,
+    GatewayIntents.DIRECT_MESSAGE_REACTIONS,
+    GatewayIntents.MESSAGE_CONTENT,
   ]
 })
 
@@ -37,16 +41,12 @@ async function buildChannelCommands(channelId: string, commands: Command[]): Pro
       await client.rest.endpoints.deleteMessage(channelId, allMessages[0].id);
       break;
     default:
-      await client.rest.endpoints.bulkDeleteMessages(channelId, allMessages.map(m => m.id));
+      await client.rest.endpoints.bulkDeleteMessages(channelId, <any>{ messages: allMessages.map(m => m.id) });
       break;
   }
 
   for (const command of commands) {
-    const message = await channel.send(channelId, typeof command.message == "string" ? {
-      content: <string>command.message
-    }: {
-      embeds: [<Embed>command.message]
-    });
+    const message = await channel.send(command.message);
 
     if (command.scopes) {
       botData.addMessageScope(message.id, command.scopes);
@@ -67,8 +67,8 @@ type EmojiButton = {
   emojis: {
     [key: string]: any
   },
-  button: (reaction: MessageReaction, value: any, scopes ? : MessageScope[]) => Promise<void>,
-  scopes ? : MessageScope[]
+  button: CommandButton,
+  scopes? : MessageScope[]
 }
 
 const regExpActions: RegExpAction[] = [{
@@ -77,7 +77,7 @@ const regExpActions: RegExpAction[] = [{
 }];
 
 function buildEmojiButtons(defaultButtons: EmojiButton[]): EmojiButton[] {
-  const result = [];
+  const result: EmojiButton[] = [];
 
   for (const command of commands) {
     let emojis: {
@@ -120,20 +120,22 @@ const emojiButtons: EmojiButton[] = buildEmojiButtons([{
   }
 ]);
 
-async function emojiButtonEvent(isAdd: boolean, reaction: MessageReaction) {
-  const name = <string> reaction.emoji.name;
-  for (const emojiButton of emojiButtons) {
-    const value = emojiButton.emojis[name];
-    if (value && (emojiButton.scopes == undefined ||
-      await botData.checkMessageScope(reaction, isAdd, emojiButton.scopes))) {
-      await emojiButton.button(reaction, value, emojiButton.scopes);
-      break;
+async function emojiButtonEvent(isAdd: boolean, reaction: MessageReaction, user: User) {
+  if (!user.bot) {
+    logger.info(labels.log.emojiButtonEvent, reaction.emoji.name, reaction.message.content, isAdd, reaction.count);
+    const name = <string> reaction.emoji.name;
+    for (const emojiButton of emojiButtons) {
+      const value = emojiButton.emojis[name];
+      if (value && (emojiButton.scopes == undefined ||
+        botData.checkMessageScope(reaction, user, isAdd, emojiButton.scopes))) {
+        await emojiButton.button(reaction, user, value, emojiButton.scopes);
+        break;
+      }
     }
   }
 }
 
 client.on('ready', async () => {
-  logger.info(labels.welcome);
   botData.outputChannel = <TextChannel> await client.channels.get<TextChannel>(config.outputChannelId);
   await buildChannelCommands(config.dicePoolsChannelId, Object.keys(dicePools).map(key => {
     return {
@@ -142,24 +144,28 @@ client.on('ready', async () => {
     };
   }));
   await buildChannelCommands(config.storytellerChannelId, commands);
+  logger.info(labels.welcome);
 });
 
 client.on('messageCreate', async (message: Message) => {
-  for (const regExpAction of regExpActions) {
-    const resultMatchAll = [...message.content.matchAll(regExpAction.regex)];
-    if (resultMatchAll.length > 0) {
-      await regExpAction.action(message, resultMatchAll);
-      break;
+  if (!message.author.bot) {
+    logger.info(labels.log.messageCreateEvent, message.content);
+    for (const regExpAction of regExpActions) {
+      const resultMatchAll = [...message.content.matchAll(regExpAction.regex)];
+      if (resultMatchAll.length > 0) {
+        await regExpAction.action(message, resultMatchAll);
+        break;
+      }
     }
   }
 });
 
 client.on('messageReactionAdd', async (reaction: MessageReaction, user: User) => {
-  await emojiButtonEvent(true, reaction);
+  await emojiButtonEvent(true, reaction, user);
 });
 
 client.on('messageReactionRemove', async (reaction: MessageReaction, user: User) => {
-  await emojiButtonEvent(false, reaction);  
+  await emojiButtonEvent(false, reaction, user);  
 });
 
 client.connect();

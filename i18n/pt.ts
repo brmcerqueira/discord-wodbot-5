@@ -1,7 +1,7 @@
 import { LabelsType } from "./labelsType.ts";
 
 export const pt: LabelsType = {
-    urlAuth: "Entre no link para autenticar -> {0}",
+    urlAuth: "Entre no link para autenticar -> %v",
     authSuccess: "Autenticado com sucesso!",
     closeThisFlap: "Ok! Pode fechar essa aba.",
     welcome: "Wodbot 5.0 entrou!",
@@ -15,12 +15,13 @@ export const pt: LabelsType = {
     success: "Sucesso",
     regularCritical: "Crítico",
     messyCritical: "Crítico Confuso",
-    reRollHelperText: "Re-rolando {0} dado(s) da última jogada...",
+    reRollHelperText: "Re-rolando %v dado(s) da última jogada...",
     configNotFound: "Nenhum arquivo de configuração encontrado.",
     storytellerChangeDifficulty: "O narrador mudou a dificuldade.",
-    changeCharacterSuccess: "Novo personagem selecionado: {0}",
-    loadCharacterSuccess: "Personagem atualizado: {0}",
-    updateExperienceSuccess: "O personagem '{0}' teve a experiência atualizada para: {1}",
+    changeCharacterSuccess: "Novo personagem selecionado: %v",
+    loadCharacterSuccess: "Personagem atualizado: %v",
+    updateExperienceSuccess: "O personagem '%v' teve a experiência atualizada para: %v",
+    jsonResponseError: "Http Error: %v %v %v %v",
     dicePools: {
         attackWithFists: {
             name: "Ataque com os Punhos",
@@ -32,6 +33,10 @@ export const pt: LabelsType = {
         reloadCharacters: "Recarregar personagens",
         addExperience: "Aumentar experiência do personagem",
         decreaseExperience: "Remover experiência do personagem",
-        changeCharacterOption: "Mudar para o personagem: {0}"
+        changeCharacterOption: "Mudar para o personagem: %v"
+    },
+    log: {
+        emojiButtonEvent: "Emoji: %v - Message: %v - IsAdd: %v - Count: %v",
+        messageCreateEvent: "Message: %v"
     }
 };

@@ -1,3 +1,4 @@
+import { labels } from "../i18n/labels.ts";
 import { logger } from "../logger.ts";
 
 export function jsonResponse(response: Response): Promise<any> {
@@ -6,7 +7,7 @@ export function jsonResponse(response: Response): Promise<any> {
     }
     else {
         return response.text().then(text => {
-            logger.error(response.status, response.statusText, response.url, text);
+            logger.error(labels.jsonResponseError, response.status, response.statusText, response.url, text);
             return Promise.reject(response.statusText);
         });        
     }

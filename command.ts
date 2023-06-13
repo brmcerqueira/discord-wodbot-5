@@ -3,11 +3,12 @@ import { labels } from "./i18n/labels.ts";
 import { setDifficultyButton } from "./buttons/setDifficultyButton.ts";
 import { reloadCharactersButton } from "./buttons/reloadCharactersButton.ts";
 import { characterManager } from "./characterManager.ts";
-import { format } from "./utils/format.ts";
 import { changeCharacterButton } from "./buttons/changeCharacterButton.ts";
 import { addExperienceButton } from "./buttons/addExperienceButton.ts";
 import { decreaseExperienceButton } from "./buttons/decreaseExperienceButton.ts";
-import { Embed, MessageReaction } from "./deps.ts";
+import { Embed, MessageReaction, User, sprintf } from "./deps.ts";
+
+export type CommandButton = (reaction: MessageReaction, user: User, value: any, scopes ? : MessageScope[]) => Promise<void>
 
 export interface Command {
     message: string | Embed,
@@ -16,7 +17,7 @@ export interface Command {
 }
 
 export interface CommandAction extends Command {
-    button: (reaction: MessageReaction, value: any, scopes?: MessageScope[]) => Promise<void>,
+    button: CommandButton
 }
 
 const defaultCommands: CommandAction[] = [
@@ -86,7 +87,7 @@ export function buildCommands(): CommandAction[] {
     for (const key in characterManager.characters) {
         const character = characterManager.characters[key];
         result.push({
-            message: `__**${format(labels.commands.changeCharacterOption, character.name)}**__`,
+            message: `__**${sprintf(labels.commands.changeCharacterOption, character.name)}**__`,
             reactions: {
                 '🧛': key
             },

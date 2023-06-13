@@ -17,9 +17,7 @@ export async function rollHelper(channel: TextChannel,
 
     const result = roll(dices, hunger, difficulty);
 
-    const message = await channel.send({
-        embeds: [rollEmbed(result, authorId, description)]
-    })
+    const message = await channel.send(rollEmbed(result, authorId, description))
 
     botData.lastRolls[authorId.toString()] = {
         messageId: message.id,

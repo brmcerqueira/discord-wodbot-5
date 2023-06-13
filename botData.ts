@@ -2,7 +2,7 @@
 import { RollResult } from "./diceRollManager.ts";
 import { config } from "./config.ts";
 import { MessageScope } from "./messageScope.ts";
-import { MessageReaction, TextChannel } from "./deps.ts";
+import { MessageReaction, TextChannel, User } from "./deps.ts";
 
 export module botData {
     export const lastRolls: {
@@ -16,11 +16,11 @@ export module botData {
         [messageId: string]: MessageScope[]
     } = {};
 
-    export async function checkMessageScope(reaction: MessageReaction, isAdd: boolean, scopes: MessageScope[]): Promise<boolean> {
+    export function checkMessageScope(reaction: MessageReaction, user: User, isAdd: boolean, scopes: MessageScope[]): boolean {
         for (const scope of scopes) {
             if ((scope == MessageScope.AddEvent && !isAdd)
             || (scope == MessageScope.RemoveEvent && isAdd)
-            || (scope == MessageScope.Storyteller && (await reaction.users.get(config.storytellerId)) != undefined)
+            || (scope == MessageScope.Storyteller && user.id != config.storytellerId)
             || ((scope != MessageScope.AddEvent 
                 && scope != MessageScope.RemoveEvent 
                 && scope != MessageScope.Storyteller) 
