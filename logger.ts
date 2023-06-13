@@ -4,7 +4,7 @@ await log.setup({
     handlers: {
         console: new log.handlers.ConsoleHandler("DEBUG", {
             formatter: rec => `[${rec.datetime.toISOString()}](${rec.levelName}) ${
-                rec.args.length > 0 ? sprintf(rec.msg, rec.args): rec.msg}` 
+                rec.args.length > 0 ? sprintf(rec.msg, ...rec.args): rec.msg}` 
         })
     },
     loggers: {
