@@ -21,13 +21,13 @@ export enum RollStatus {
 }
 
 export function roll(amount: number, hunger: number, difficulty: number): RollResult {
-  let dices: DiceResult[] = [];
-  
+  const dices: DiceResult[] = [];
+
   for (let i = 0; i < amount; i++) {
     dices.push(throwDice(i < hunger));
   }
 
-  let computed = computedRoll(dices, difficulty);
+  const computed = computedRoll(dices, difficulty);
 
   return {
     amount,
@@ -50,7 +50,7 @@ export function reRoll(result: RollResult, amount: number): RollResult {
     }
   }
 
-  let computed = computedRoll(result.dices, result.difficulty);
+  const computed = computedRoll(result.dices, result.difficulty);
 
   return {
     amount: result.amount,
@@ -67,12 +67,12 @@ function computedRoll(dices: DiceResult[], difficulty: number): {
   status: RollStatus,
   dices: DiceResult[]
 } {
-  let successes: number = 0;
+  let successes = 0;
   let status: RollStatus = RollStatus.Failure;
   let criticalStatus: RollStatus | null = null;
   let lastTen: DiceResult | null = null;
-  let hasBestialFailure: boolean = false;
-  
+  let hasBestialFailure = false;
+
   for (const dice of dices) {
     if (dice.value >= 6) {
       successes++;
@@ -108,7 +108,7 @@ function computedRoll(dices: DiceResult[], difficulty: number): {
   };
 }
 
-function throwDice(isHunger: boolean = false): DiceResult {
+function throwDice(isHunger = false): DiceResult {
   return {
     value: Math.floor((Math.random() * 10) + 1),
     isHunger: isHunger

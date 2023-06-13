@@ -2,7 +2,7 @@ import { MessageScope } from "./messageScope.ts";
 import { labels } from "./i18n/labels.ts";
 import { setDifficultyButton } from "./buttons/setDifficultyButton.ts";
 import { reloadCharactersButton } from "./buttons/reloadCharactersButton.ts";
-import { characterManager } from "./characterManager.ts";
+import * as characterManager from "./characterManager.ts";
 import { changeCharacterButton } from "./buttons/changeCharacterButton.ts";
 import { addExperienceButton } from "./buttons/addExperienceButton.ts";
 import { decreaseExperienceButton } from "./buttons/decreaseExperienceButton.ts";

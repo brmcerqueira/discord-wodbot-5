@@ -1,14 +1,14 @@
-import { Client, Embed, GatewayIntents, Message, MessageReaction, TextChannel, User } from "./deps.ts";
+import { Client, GatewayIntents, Message, MessageReaction, TextChannel, User } from "./deps.ts";
 import { labels } from "./i18n/labels.ts";
 import { config } from "./config.ts";
 import { reRollButton } from "./buttons/reRollButton.ts";
-import { googleSheets } from "./googleSheets.ts";
+import * as googleSheets from "./googleSheets.ts";
 import { logger } from "./logger.ts";
 import { dicePools } from "./dicePools.ts";
 import { dicePoolButton } from "./buttons/dicePoolButton.ts";
 import { rollAction } from "./actions/rollAction.ts";
-import { botData } from "./botData.ts";
-import { characterManager } from "./characterManager.ts";
+import * as botData from "./botData.ts";
+import * as characterManager from "./characterManager.ts";
 import { MessageScope } from "./messageScope.ts";
 import { Command, CommandButton, buildCommands } from "./command.ts";
 
@@ -19,7 +19,7 @@ const commands = buildCommands();
 
 const client = new Client({
   token: config.discordToken,
-  intents:  [
+  intents: [
     GatewayIntents.GUILDS,
     GatewayIntents.GUILD_MESSAGES,
     GatewayIntents.GUILD_MESSAGE_REACTIONS,
@@ -31,7 +31,7 @@ const client = new Client({
 })
 
 async function buildChannelCommands(channelId: string, commands: Command[]): Promise<void> {
-  const channel = <TextChannel> await client.channels.get<TextChannel>(channelId);
+  const channel = <TextChannel>await client.channels.get<TextChannel>(channelId);
   const allMessages = await client.rest.endpoints.getChannelMessages(channelId);
 
   switch (allMessages.length) {
@@ -52,7 +52,7 @@ async function buildChannelCommands(channelId: string, commands: Command[]): Pro
       botData.addMessageScope(message.id, command.scopes);
     }
 
-    for (const reaction of (Array.isArray(command.reactions) ? <string[]> command.reactions : Object.keys(command.reactions))) {
+    for (const reaction of (Array.isArray(command.reactions) ? <string[]>command.reactions : Object.keys(command.reactions))) {
       await message.addReaction(reaction);
     }
   }
@@ -68,7 +68,7 @@ type EmojiButton = {
     [key: string]: any
   },
   button: CommandButton,
-  scopes? : MessageScope[]
+  scopes?: MessageScope[]
 }
 
 const regExpActions: RegExpAction[] = [{
@@ -87,7 +87,7 @@ function buildEmojiButtons(defaultButtons: EmojiButton[]): EmojiButton[] {
     if (Array.isArray(command.reactions)) {
       emojis = {};
       command.reactions.forEach(r => emojis[r] = r);
-    } 
+    }
     else {
       emojis = command.reactions;
     }
@@ -107,23 +107,23 @@ function buildEmojiButtons(defaultButtons: EmojiButton[]): EmojiButton[] {
 }
 
 const emojiButtons: EmojiButton[] = buildEmojiButtons([{
-    emojis: {
-      '1️⃣': 1,
-      '2️⃣': 2,
-      '3️⃣': 3
-    },
-    button: reRollButton
+  emojis: {
+    '1️⃣': 1,
+    '2️⃣': 2,
+    '3️⃣': 3
   },
-  {
-    emojis: dicePools,
-    button: dicePoolButton
-  }
+  button: reRollButton
+},
+{
+  emojis: dicePools,
+  button: dicePoolButton
+}
 ]);
 
 async function emojiButtonEvent(isAdd: boolean, reaction: MessageReaction, user: User) {
   if (!user.bot) {
     logger.info(labels.log.emojiButtonEvent, reaction.emoji.name, reaction.message.content, isAdd, reaction.count);
-    const name = <string> reaction.emoji.name;
+    const name = <string>reaction.emoji.name;
     for (const emojiButton of emojiButtons) {
       const value = emojiButton.emojis[name];
       if (value && (emojiButton.scopes == undefined ||
@@ -136,7 +136,7 @@ async function emojiButtonEvent(isAdd: boolean, reaction: MessageReaction, user:
 }
 
 client.on('ready', async () => {
-  botData.outputChannel = <TextChannel> await client.channels.get<TextChannel>(config.outputChannelId);
+  botData.setOutputChannel((await client.channels.get(config.outputChannelId))!);
   await buildChannelCommands(config.dicePoolsChannelId, Object.keys(dicePools).map(key => {
     return {
       message: `__**${dicePools[key].name}**__`,
@@ -165,7 +165,7 @@ client.on('messageReactionAdd', async (reaction: MessageReaction, user: User) =>
 });
 
 client.on('messageReactionRemove', async (reaction: MessageReaction, user: User) => {
-  await emojiButtonEvent(false, reaction, user);  
+  await emojiButtonEvent(false, reaction, user);
 });
 
 client.connect();

@@ -1,6 +1,6 @@
 import { reRoll } from "../diceRollManager.ts";
 import { labels } from "../i18n/labels.ts";
-import { botData } from "../botData.ts";
+import * as botData from "../botData.ts";
 import { MessageReaction, User, sprintf } from "../deps.ts";
 import { rollEmbed } from "../utils/rollEmbed.ts";
 

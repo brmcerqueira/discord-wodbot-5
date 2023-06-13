@@ -1,5 +1,5 @@
 import { roll } from "../diceRollManager.ts";
-import { botData } from "../botData.ts";
+import * as botData from "../botData.ts";
 import { TextChannel } from "../deps.ts";
 import { rollEmbed } from "./rollEmbed.ts";
 
@@ -12,7 +12,7 @@ export async function rollHelper(channel: TextChannel,
 
     if (botData.difficulty) {
         difficulty = botData.difficulty;
-        botData.difficulty = null;
+        botData.setDifficulty(null);
     }
 
     const result = roll(dices, hunger, difficulty);
