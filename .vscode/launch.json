@@ -13,8 +13,10 @@
             "runtimeExecutable": "deno",
             "runtimeArgs": [
                 "run",
-                "--inspect-brk",
-                "--allow-all"
+                "--inspect-wait",
+                "--allow-all",
+                "--config",
+                "./tsconfig.json",
             ],
             "attachSimplePort": 9229
         }

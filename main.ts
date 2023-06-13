@@ -19,6 +19,7 @@ const commands = buildCommands();
 
 const client = new Client({
   token: config.discordToken,
+  forceNewSession: true,
   intents: [
     GatewayIntents.GUILDS,
     GatewayIntents.GUILD_MESSAGES,
@@ -31,14 +32,14 @@ const client = new Client({
 });
 
 async function buildChannelCommands(channelId: string, commands: Command[]): Promise<void> {
-  const channel = <TextChannel>await client.channels.get<TextChannel>(channelId);
-  const allMessages = await client.rest.endpoints.getChannelMessages(channelId);
+  const channel = <TextChannel>await client.channels.fetch<TextChannel>(channelId);
+  const allMessages = await channel.fetchMessages();
 
-  switch (allMessages.length) {
+  switch (allMessages.size) {
     case 0:
       break;
     case 1:
-      await client.rest.endpoints.deleteMessage(channelId, allMessages[0].id);
+      await client.rest.endpoints.deleteMessage(channelId, allMessages.first()!.id);
       break;
     default:
       await client.rest.endpoints.bulkDeleteMessages(channelId, <any>{ messages: allMessages.map(m => m.id) });
@@ -136,7 +137,12 @@ async function emojiButtonEvent(isAdd: boolean, reaction: MessageReaction, user:
 }
 
 client.on('ready', async () => {
-  botData.setOutputChannel((await client.channels.get(config.outputChannelId))!);
+  logger.info(labels.loading);
+  await client.users.fetch(config.storytellerId);
+  for (const id of Object.keys(config.playerCharacters)) {
+    await client.users.fetch(id);
+  }
+  botData.setOutputChannel((await client.channels.fetch(config.outputChannelId))!);
   await buildChannelCommands(config.dicePoolsChannelId, Object.keys(dicePools).map(key => {
     return {
       message: `__**${dicePools[key].name}**__`,
@@ -144,29 +150,28 @@ client.on('ready', async () => {
     };
   }));
   await buildChannelCommands(config.storytellerChannelId, commands);
+  logger.info(labels.welcome);
+});
 
-  client.on('messageCreate', async (message: Message) => {
-    if (!message.author.bot) {
-      logger.info(labels.log.messageCreateEvent, message.content);
-      for (const regExpAction of regExpActions) {
-        const resultMatchAll = [...message.content.matchAll(regExpAction.regex)];
-        if (resultMatchAll.length > 0) {
-          await regExpAction.action(message, resultMatchAll);
-          break;
-        }
+client.on('messageCreate', async (message: Message) => {
+  if (!message.author.bot) {
+    logger.info(labels.log.messageCreateEvent, message.content);
+    for (const regExpAction of regExpActions) {
+      const resultMatchAll = [...message.content.matchAll(regExpAction.regex)];
+      if (resultMatchAll.length > 0) {
+        await regExpAction.action(message, resultMatchAll);
+        break;
       }
     }
-  });
-  
-  client.on('messageReactionAdd', async (reaction: MessageReaction, user: User) => {
-    await emojiButtonEvent(true, reaction, user);
-  });
-  
-  client.on('messageReactionRemove', async (reaction: MessageReaction, user: User) => {
-    await emojiButtonEvent(false, reaction, user);
-  });
+  }
+});
 
-  logger.info(labels.welcome);
+client.on('messageReactionAdd', async (reaction: MessageReaction, user: User) => {
+  await emojiButtonEvent(true, reaction, user);
+});
+
+client.on('messageReactionRemove', async (reaction: MessageReaction, user: User) => {
+  await emojiButtonEvent(false, reaction, user);
 });
 
 client.connect();

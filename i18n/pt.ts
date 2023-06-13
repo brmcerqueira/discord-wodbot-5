@@ -22,6 +22,7 @@ export const pt: LabelsType = {
     loadCharacterSuccess: "Personagem atualizado: %v",
     updateExperienceSuccess: "O personagem '%v' teve a experiência atualizada para: %v",
     jsonResponseError: "Http Error: %v %v %v %v",
+    loading: "Carregando...",
     dicePools: {
         attackWithFists: {
             name: "Ataque com os Punhos",
