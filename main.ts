@@ -66,7 +66,7 @@ async function buildChannelCommands(channelId: string, channelCommands: Command[
         type: MessageComponentType.Button,
         label: button.label || '',
         emoji: button.emoji,
-        style: ButtonStyle.SUCCESS,
+        style: button.style,
         customID: botData.buildId(index, ...(command.scopes || []))
       });
 
