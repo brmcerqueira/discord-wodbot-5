@@ -16,8 +16,8 @@ export type DicePools = {
     [emoji: string]: DicePool
 }
 
-export const dicePools: DicePools = {
-    '🤛🏻': {
+export const dicePools: DicePool[] = [
+    {
         name: labels.dicePools.attackWithFists.name,
         description: labels.dicePools.attackWithFists.description,
         action: c => {
@@ -27,4 +27,4 @@ export const dicePools: DicePools = {
             };
         }
     }
-}
+]

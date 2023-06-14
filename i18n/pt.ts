@@ -14,7 +14,7 @@ export const pt: LabelsType = {
     failure: "Falha",
     success: "Sucesso",
     regularCritical: "Crítico",
-    messyCritical: "Crítico Confuso",
+    messyCritical: "Crítico Bestial",
     reRollHelperText: "Re-rolando %v dado(s) da última jogada...",
     configNotFound: "Nenhum arquivo de configuração encontrado.",
     storytellerChangeDifficulty: "O narrador mudou a dificuldade.",
@@ -40,6 +40,6 @@ export const pt: LabelsType = {
     },
     log: {
         interactionCreateEvent: "Comando: %v - Opção: %v",
-        messageCreateEvent: "Message: %v"
+        messageCreateEvent: "Messagem: %v"
     }
 };

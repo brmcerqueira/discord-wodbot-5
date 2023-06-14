@@ -20,13 +20,15 @@ export async function rollHelper(channel: TextChannel,
 
     const margin = dices - hunger;
 
+    const embed = rollEmbed(result, authorId, description);
+
     const options: AllMessageOptions = {
-        embeds: [
-            rollEmbed(result, authorId, description)
-        ]
+        embeds: [embed]
     };
 
     if (margin > 0) {
+        const scopes = [MessageScope.ReRoll];
+
         const buttons: MessageComponentData[] = [{
             type: MessageComponentType.Button,
             label: '',
@@ -34,7 +36,7 @@ export async function rollHelper(channel: TextChannel,
                 name: '1️⃣'
             },
             style: ButtonStyle.SECONDARY,
-            customID: "1"
+            customID: botData.buildId(1, ...scopes)
         }];
 
         options.components = [{
@@ -50,7 +52,7 @@ export async function rollHelper(channel: TextChannel,
                     name: '2️⃣'
                 },
                 style: ButtonStyle.SECONDARY,
-                customID: "2"
+                customID: botData.buildId(2, ...scopes)
             });
         }
 
@@ -62,17 +64,15 @@ export async function rollHelper(channel: TextChannel,
                     name: '3️⃣'
                 },
                 style: ButtonStyle.SECONDARY,
-                customID: "3"
+                customID: botData.buildId(3, ...scopes)
             })
         }
     }
 
-    const message = await channel.send(options);
-
-    botData.addMessageScope(message.id, [MessageScope.ReRoll]);
+    await channel.send(options);
 
     botData.lastRolls[authorId.toString()] = {
-        message: message,
+        embed: embed,
         result: result
     };
 }

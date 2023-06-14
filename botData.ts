@@ -1,36 +1,29 @@
 import { RollResult } from "./diceRollManager.ts";
 import { config } from "./config.ts";
 import { MessageScope } from "./messageScope.ts";
-import { Interaction, Message, TextChannel } from "./deps.ts";
+import { Embed, TextChannel, User } from "./deps.ts";
+
+export type CustomId = { index: number, scopes?: MessageScope[] };
 
 export const lastRolls: {
     [userId: string]: {
-        message: Message,
+        embed: Embed,
         result: RollResult
     }
 } = {};
 
-const scopeMessages: {
-    [messageId: string]: MessageScope[]
-} = {};
-
-export function checkMessageScope(interaction: Interaction, scopes: MessageScope[]): boolean {
-    for (const scope of scopes) {
-        if ((scope == MessageScope.Storyteller && interaction.user.id != config.storytellerId)
-            || (scope != MessageScope.Storyteller
-                && (interaction.message && (!scopeMessages[interaction.message.id] || (scopeMessages[interaction.message.id]
-                    && scopeMessages[interaction.message.id].indexOf(scope) == -1))))) {
-            return false;
+export function checkMessageScope(user: User, customId: CustomId, scopes: MessageScope[]): boolean {
+    if (scopes.length > 0) {
+        for (const scope of scopes) {
+            if ((scope == MessageScope.Storyteller && user.id != config.storytellerId)
+                || (scope != MessageScope.Storyteller
+                    && (!customId.scopes || customId.scopes.indexOf(scope) == -1))) {
+                return false;
+            }
         }
     }
-    return true;
-}
 
-export function addMessageScope(messageId: string, scopes: MessageScope[]): void {
-    if (!scopeMessages[messageId]) {
-        scopeMessages[messageId] = [];
-    }
-    scopes.forEach(s => scopeMessages[messageId].push(s));
+    return true;
 }
 
 export let outputChannel: TextChannel;
@@ -50,4 +43,26 @@ export let storytellerSpreadSheetId: string =
 
 export function setStorytellerSpreadSheetId(value: string) {
     storytellerSpreadSheetId = value;
+}
+
+export function parseCustomId(id: string): CustomId {
+    const split = id.split('_', 2);
+
+    if (split.length == 0) {
+        const bit = parseInt(split[0]);
+    
+        return { 
+            index: parseInt(split[1]),
+            scopes: Object.keys(MessageScope)
+            .map(Number).filter(value => (bit & value) === value)
+        };
+    }
+
+    return { 
+        index: parseInt(id) 
+    };
+}
+
+export function buildId(index: number, ...scopes: MessageScope[]): string {
+    return scopes.length > 0 ? `${scopes.reduce((total, current) => total + current, 0)}_${index}` : index.toString();
 }

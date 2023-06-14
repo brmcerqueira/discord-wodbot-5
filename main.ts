@@ -1,4 +1,4 @@
-import { ButtonStyle, Client, GatewayIntents, Interaction, InteractionMessageComponentData, InteractionResponseType, InteractionType, Message, MessageComponentData, MessageComponentType,  TextChannel } from "./deps.ts";
+import { ButtonStyle, Client, GatewayIntents, Interaction, InteractionMessageComponentData, InteractionResponseType, InteractionType, Message, MessageComponentData, MessageComponentType, TextChannel } from "./deps.ts";
 import { labels } from "./i18n/labels.ts";
 import { config } from "./config.ts";
 import { reRollButton } from "./buttons/reRollButton.ts";
@@ -64,7 +64,7 @@ async function buildChannelCommands(channelId: string, channelCommands: Command[
         label: button.label || '',
         emoji: button.emoji,
         style: ButtonStyle.SUCCESS,
-        customID: index.toString()
+        customID: botData.buildId(index, ...(command.scopes || []))
       });
 
       if (buttons.length >= 5 || index == (command.buttons!.length - 1)) {
@@ -76,13 +76,9 @@ async function buildChannelCommands(channelId: string, channelCommands: Command[
       }
     }
 
-    const message = await channel.send(command.message, {
+    await channel.send(command.message, {
       components: actionRows
     });
-
-    if (command.scopes) {
-      botData.addMessageScope(message.id, command.scopes);
-    }
 
     commands.push(command);
   }
@@ -105,15 +101,15 @@ client.on('ready', async () => {
     await client.users.fetch(id);
   }
   botData.setOutputChannel((await client.channels.fetch(config.outputChannelId))!);
-  await buildChannelCommands(config.dicePoolsChannelId, Object.keys(dicePools).map(key => {
+  await buildChannelCommands(config.dicePoolsChannelId, dicePools.map(dicePool => {
     return {
-      message: `__**${dicePools[key].name}**__`,
+      message: `__**${dicePool.name}**__`,
       buttons: [{
           style: ButtonStyle.PRIMARY,
           emoji: {
               name: '🎲'
           },
-          value: dicePools[key]
+          value: dicePool
       }],
       scopes: [MessageScope.DicePool],
       action: dicePoolButton
@@ -139,16 +135,19 @@ client.on('messageCreate', async (message: Message) => {
 client.on('interactionCreate', async (interaction: Interaction) => {
   if (!interaction.user.bot && interaction.type == InteractionType.MESSAGE_COMPONENT) {
     const data = <InteractionMessageComponentData> interaction.data;
-    logger.debug(labels.log.interactionCreateEvent, interaction.message?.content, data.custom_id);
+    const customId = botData.parseCustomId(data.custom_id);
+    logger.debug(labels.log.interactionCreateEvent, interaction.message?.content, customId.index);
     for (const command of commands) {
-      if (command.scopes == undefined || botData.checkMessageScope(interaction, command.scopes)) {
+      if (command.scopes == undefined || botData.checkMessageScope(interaction.user, customId, command.scopes)) {
         await command.action(interaction, 
-          command.buttons ? command.buttons[parseInt(data.custom_id)].value : data, 
+          command.buttons ? command.buttons[customId.index].value : data, 
           command.scopes);
-        await interaction.respond({
-          type: InteractionResponseType.UPDATE_MESSAGE,
-          content: interaction.message!.content
-        });
+        if (!interaction.responded) {
+          await interaction.respond({
+            type: InteractionResponseType.UPDATE_MESSAGE,
+            content: interaction.message!.content
+          });
+        }  
         break;
       }
     }
