@@ -22,6 +22,7 @@ export const pt: LabelsType = {
     loadCharacterSuccess: "Personagem atualizado: %v",
     updateExperienceSuccess: "O personagem '%v' teve a experiência atualizada para: %v",
     updateHungerSuccess: "O personagem '%v' teve a fome atualizada para: %v",
+    currentCharacter: "Personagem selecionado",
     jsonResponseError: "Http Error: %v %v %v %v",
     loading: "Carregando...",
     dicePools: {

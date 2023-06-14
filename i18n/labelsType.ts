@@ -25,6 +25,7 @@ export type LabelsType = {
     loadCharacterSuccess: string,
     updateExperienceSuccess: string,
     updateHungerSuccess: string,
+    currentCharacter: string,
     jsonResponseError: string,
     loading: string,
     dicePools: {

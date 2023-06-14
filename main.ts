@@ -4,14 +4,12 @@ import { config } from "./config.ts";
 import { reRollButton } from "./buttons/reRollButton.ts";
 import * as googleSheets from "./googleSheets.ts";
 import { logger } from "./logger.ts";
-import { dicePools } from "./dicePools.ts";
-import { dicePoolButton } from "./buttons/dicePoolButton.ts";
+import * as dicePools from "./dicePools.ts";
 import { rollAction } from "./actions/rollAction.ts";
 import * as botData from "./botData.ts";
 import * as characterManager from "./characterManager.ts";
 import * as storyteller from "./storyteller.ts";
-import { Command } from "./command.ts";
-import { MessageScope } from "./messageScope.ts";
+import { Command, ReRoll } from "./command.ts";
 
 await googleSheets.auth();
 await characterManager.load();
@@ -19,7 +17,7 @@ await characterManager.load();
 const storytellerCommands = storyteller.buildCommands();
 
 const commands: Command[] = [{
-  scopes: [MessageScope.ReRoll],
+  scopes: [ReRoll],
   action: reRollButton
 }];
 
@@ -36,27 +34,32 @@ const client = new Client({
   ]
 });
 
-async function buildChannelCommands(channelId: string, channelCommands: Command[]): Promise<void> {
-  const channel = <TextChannel>await client.channels.fetch<TextChannel>(channelId);
+async function buildChannelCommands(channelId: string, channelCommands: Command[], beforeMessages?: (c: TextChannel) => Promise<void>) {
+  const channel: TextChannel = await client.channels.fetch(channelId);
+
   const allMessages = await channel.fetchMessages();
 
-  switch (allMessages.size) {
+  switch(allMessages.size) {
     case 0:
       break;
     case 1:
-      await client.rest.endpoints.deleteMessage(channelId, allMessages.first()!.id);
+      await client.rest.endpoints.deleteMessage(channel.id, allMessages.first()!.id);
       break;
     default:
-      await client.rest.endpoints.bulkDeleteMessages(channelId, <any>{ messages: allMessages.map(m => m.id) });
+      await client.rest.endpoints.bulkDeleteMessages(channel.id, <any>{ messages: allMessages.map(m => m.id) });
       break;
   }
 
-  for (const command of channelCommands) {
+  if (beforeMessages) {
+    await beforeMessages(channel);
+  }
+
+  for(const command of channelCommands) {
     let buttons: MessageComponentData[] = [];
 
     const actionRows: MessageComponentData[] = [];
 
-    for (let index = 0; index < command.buttons!.length; index++) {
+    for(let index = 0;index < command.buttons!.length;index++) {
       const button = command.buttons![index];
 
       buttons.push({
@@ -67,7 +70,7 @@ async function buildChannelCommands(channelId: string, channelCommands: Command[
         customID: botData.buildId(index, ...(command.scopes || []))
       });
 
-      if (buttons.length >= 5 || index == (command.buttons!.length - 1)) {
+      if(buttons.length >= 5 || index == (command.buttons!.length - 1)) {
         actionRows.push({
           type: MessageComponentType.ActionRow,
           components: buttons
@@ -101,21 +104,8 @@ client.on('ready', async () => {
     await client.users.fetch(id);
   }
   botData.setOutputChannel((await client.channels.fetch(config.outputChannelId))!);
-  await buildChannelCommands(config.dicePoolsChannelId, dicePools.map(dicePool => {
-    return {
-      message: `__**${dicePool.name}**__`,
-      buttons: [{
-          style: ButtonStyle.PRIMARY,
-          emoji: {
-              name: '🎲'
-          },
-          value: dicePool
-      }],
-      scopes: [MessageScope.DicePool],
-      action: dicePoolButton
-    };
-  }));
-  await buildChannelCommands(config.storytellerChannelId, storytellerCommands);
+  await buildChannelCommands(config.dicePoolsChannelId, dicePools.buildCommands());
+  await buildChannelCommands(config.storytellerChannelId, storytellerCommands, async c => await botData.buildCurrentCharacterMessage(c));
   logger.info(labels.welcome);
 });
 
@@ -140,7 +130,7 @@ client.on('interactionCreate', async (interaction: Interaction) => {
     for (const command of commands) {
       if (command.scopes == undefined || botData.checkMessageScope(interaction.user, customId, command.scopes)) {
         await command.action(interaction, 
-          command.buttons ? command.buttons[customId.index].value : data, 
+          command.buttons ? command.buttons[customId.index].value : customId, 
           command.scopes);
         if (!interaction.responded) {
           await interaction.respond({

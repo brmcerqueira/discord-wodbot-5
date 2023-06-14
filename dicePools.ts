@@ -1,4 +1,7 @@
+import { dicePoolButton } from "./buttons/dicePoolButton.ts";
 import { Character } from "./character.ts"
+import { Command, DicePool, createCommandScope } from "./command.ts";
+import { ButtonStyle } from "./deps.ts";
 import { labels } from "./i18n/labels.ts"
 
 export type DicePoolResult = {
@@ -16,7 +19,24 @@ export type DicePools = {
     [emoji: string]: DicePool
 }
 
-export const dicePools: DicePool[] = [
+export function buildCommands(): Command[] {
+    return dicePools.map(dicePool => {
+        return {
+          message: `__**${dicePool.name}**__`,
+          buttons: [{
+              style: ButtonStyle.SECONDARY,
+              emoji: {
+                  name: '🎲'
+              },
+              value: dicePool
+          }],
+          scopes: [DicePool, createCommandScope()],
+          action: dicePoolButton
+        };
+      })
+}
+
+const dicePools: DicePool[] = [
     {
         name: labels.dicePools.attackWithFists.name,
         description: labels.dicePools.attackWithFists.description,

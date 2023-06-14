@@ -2,7 +2,7 @@ import { roll } from "../diceRollManager.ts";
 import * as botData from "../botData.ts";
 import { AllMessageOptions, ButtonStyle, MessageComponentData, MessageComponentType, TextChannel } from "../deps.ts";
 import { rollEmbed } from "./rollEmbed.ts";
-import { MessageScope } from "../messageScope.ts";
+import { ReRoll } from "../command.ts";
 
 export async function rollHelper(channel: TextChannel,
     authorId: string,
@@ -27,7 +27,7 @@ export async function rollHelper(channel: TextChannel,
     };
 
     if (margin > 0) {
-        const scopes = [MessageScope.ReRoll];
+        const scopes = [ReRoll];
 
         const buttons: MessageComponentData[] = [{
             type: MessageComponentType.Button,
