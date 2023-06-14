@@ -1,13 +1,14 @@
 import { roll } from "../diceRollManager.ts";
 import * as botData from "../botData.ts";
-import { TextChannel } from "../deps.ts";
+import { AllMessageOptions, ButtonStyle, MessageComponentData, MessageComponentType, TextChannel } from "../deps.ts";
 import { rollEmbed } from "./rollEmbed.ts";
+import { MessageScope } from "../messageScope.ts";
 
-export async function rollHelper(channel: TextChannel, 
-    authorId: string, 
-    dices: number, 
-    hunger: number, 
-    difficulty: number, 
+export async function rollHelper(channel: TextChannel,
+    authorId: string,
+    dices: number,
+    hunger: number,
+    difficulty: number,
     description: string | undefined): Promise<void> {
 
     if (botData.difficulty) {
@@ -17,24 +18,61 @@ export async function rollHelper(channel: TextChannel,
 
     const result = roll(dices, hunger, difficulty);
 
-    const message = await channel.send(rollEmbed(result, authorId, description))
-
-    botData.lastRolls[authorId.toString()] = {
-        messageId: message.id,
-        result: result
-    };
-    
     const margin = dices - hunger;
 
+    const options: AllMessageOptions = {
+        embeds: [
+            rollEmbed(result, authorId, description)
+        ]
+    };
+
     if (margin > 0) {
-        await message.addReaction('1️⃣');
-  
-        if (margin >= 2) { 
-            await message.addReaction('2️⃣');   
-        } 
-        
-        if (margin >= 3) { 
-            await message.addReaction('3️⃣');
+        const buttons: MessageComponentData[] = [{
+            type: MessageComponentType.Button,
+            label: '',
+            emoji: {
+                name: '1️⃣'
+            },
+            style: ButtonStyle.SECONDARY,
+            customID: "1"
+        }];
+
+        options.components = [{
+            type: MessageComponentType.ActionRow,
+            components: buttons
+        }];
+
+        if (margin >= 2) {
+            buttons.push({
+                type: MessageComponentType.Button,
+                label: '',
+                emoji: {
+                    name: '2️⃣'
+                },
+                style: ButtonStyle.SECONDARY,
+                customID: "2"
+            });
+        }
+
+        if (margin >= 3) {
+            buttons.push({
+                type: MessageComponentType.Button,
+                label: '',
+                emoji: {
+                    name: '3️⃣'
+                },
+                style: ButtonStyle.SECONDARY,
+                customID: "3"
+            })
         }
     }
+
+    const message = await channel.send(options);
+
+    botData.addMessageScope(message.id, [MessageScope.ReRoll]);
+
+    botData.lastRolls[authorId.toString()] = {
+        message: message,
+        result: result
+    };
 }

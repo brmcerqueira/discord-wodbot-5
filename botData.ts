@@ -1,11 +1,11 @@
 import { RollResult } from "./diceRollManager.ts";
 import { config } from "./config.ts";
 import { MessageScope } from "./messageScope.ts";
-import { MessageReaction, TextChannel, User } from "./deps.ts";
+import { Interaction, Message, TextChannel } from "./deps.ts";
 
 export const lastRolls: {
     [userId: string]: {
-        messageId: string,
+        message: Message,
         result: RollResult
     }
 } = {};
@@ -14,16 +14,12 @@ const scopeMessages: {
     [messageId: string]: MessageScope[]
 } = {};
 
-export function checkMessageScope(reaction: MessageReaction, user: User, isAdd: boolean, scopes: MessageScope[]): boolean {
+export function checkMessageScope(interaction: Interaction, scopes: MessageScope[]): boolean {
     for (const scope of scopes) {
-        if ((scope == MessageScope.AddEvent && !isAdd)
-            || (scope == MessageScope.RemoveEvent && isAdd)
-            || (scope == MessageScope.Storyteller && user.id != config.storytellerId)
-            || ((scope != MessageScope.AddEvent
-                && scope != MessageScope.RemoveEvent
-                && scope != MessageScope.Storyteller)
-                && (!scopeMessages[reaction.message.id] || (scopeMessages[reaction.message.id]
-                    && scopeMessages[reaction.message.id].indexOf(scope) == -1)))) {
+        if ((scope == MessageScope.Storyteller && interaction.user.id != config.storytellerId)
+            || (scope != MessageScope.Storyteller
+                && (interaction.message && (!scopeMessages[interaction.message.id] || (scopeMessages[interaction.message.id]
+                    && scopeMessages[interaction.message.id].indexOf(scope) == -1))))) {
             return false;
         }
     }

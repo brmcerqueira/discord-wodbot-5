@@ -1,17 +1,19 @@
 import { reRoll } from "../diceRollManager.ts";
 import { labels } from "../i18n/labels.ts";
 import * as botData from "../botData.ts";
-import { MessageReaction, User, sprintf } from "../deps.ts";
+import { Interaction, InteractionMessageComponentData, sprintf } from "../deps.ts";
 import { rollEmbed } from "../utils/rollEmbed.ts";
 
-export async function reRollButton(reaction: MessageReaction, user: User, value: number) {
-    const roll = botData.lastRolls[user.id];
+export async function reRollButton(interaction: Interaction, value: InteractionMessageComponentData) {
+    const roll = botData.lastRolls[interaction.user.id];
     if (roll) {
-        delete botData.lastRolls[user.id];
+        delete botData.lastRolls[interaction.user.id];
         if ((roll.result.amount - roll.result.hunger) > 0) {
-            await reaction.client.rest.endpoints.deleteAllReactions(reaction.message.channelID, roll.messageId);
-            await reaction.message.channel.send(rollEmbed(reRoll(roll.result, value), user.id, 
-            sprintf(labels.reRollHelperText, value)));
+            await interaction.editMessage(roll.message, {
+                embeds: roll.message.embeds
+            });
+            await interaction.message!.channel.send(rollEmbed(reRoll(roll.result, parseInt(value.custom_id)), 
+            interaction.user.id, sprintf(labels.reRollHelperText, value)));
         }
     }
 }

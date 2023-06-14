@@ -1,114 +1,19 @@
 import { MessageScope } from "./messageScope.ts";
-import { labels } from "./i18n/labels.ts";
-import { setDifficultyButton } from "./buttons/setDifficultyButton.ts";
-import { reloadCharactersButton } from "./buttons/reloadCharactersButton.ts";
-import * as characterManager from "./characterManager.ts";
-import { changeCharacterButton } from "./buttons/changeCharacterButton.ts";
-import { addExperienceButton } from "./buttons/addExperienceButton.ts";
-import { decreaseExperienceButton } from "./buttons/decreaseExperienceButton.ts";
-import { Embed, MessageReaction, User, sprintf } from "./deps.ts";
-import { setHungerButton } from "./buttons/setHungerButton.ts";
+import { ButtonStyle, Embed, Interaction, MessageComponentEmoji } from "./deps.ts";
 
-export type CommandButton = (reaction: MessageReaction, user: User, value: any, scopes ? : MessageScope[]) => Promise<void>
+export type Button = {
+  style: ButtonStyle;
+  value?: any;
+  label?: string;
+  disabled?: boolean;
+  emoji?: MessageComponentEmoji;
+};
+
+export type CommandAction = (interaction: Interaction, value: any, scopes?: MessageScope[]) => Promise<void>;
 
 export interface Command {
-    message: string | Embed,
-    reactions: string[] | { [key: string]: any },
-    scopes?: MessageScope[]
-}
-
-export interface CommandAction extends Command {
-    button: CommandButton
-}
-
-const defaultCommands: CommandAction[] = [
-    {
-        message: `__**${labels.commands.reloadCharacters}**__`,
-        reactions: ['🔃'],
-        scopes: [MessageScope.Storyteller, MessageScope.ReloadCharacters],
-        button: reloadCharactersButton
-    },
-    {
-        message: `__**${labels.commands.setDifficulty}**__`,
-        reactions: {
-            '1️⃣': 1, 
-            '2️⃣': 2, 
-            '3️⃣': 3, 
-            '4️⃣': 4, 
-            '5️⃣': 5, 
-            '6️⃣': 6, 
-            '7️⃣': 7, 
-            '8️⃣': 8, 
-            '9️⃣': 9
-        },
-        scopes: [MessageScope.Storyteller, MessageScope.SetDifficulty],
-        button: setDifficultyButton
-    },
-    {
-        message: `__**${labels.commands.addExperience}**__`,
-        reactions: {
-            '1️⃣': 1, 
-            '2️⃣': 2, 
-            '3️⃣': 3, 
-            '4️⃣': 4, 
-            '5️⃣': 5, 
-            '6️⃣': 6, 
-            '7️⃣': 7, 
-            '8️⃣': 8, 
-            '9️⃣': 9
-        },
-        scopes: [MessageScope.Storyteller, MessageScope.AddExperience],
-        button: addExperienceButton
-    },
-    {
-        message: `__**${labels.commands.decreaseExperience}**__`,
-        reactions: {
-            '1️⃣': 1, 
-            '2️⃣': 2, 
-            '3️⃣': 3, 
-            '4️⃣': 4, 
-            '5️⃣': 5, 
-            '6️⃣': 6, 
-            '7️⃣': 7, 
-            '8️⃣': 8, 
-            '9️⃣': 9
-        },
-        scopes: [MessageScope.Storyteller, MessageScope.DecreaseExperience],
-        button: decreaseExperienceButton
-    },
-    {
-        message: `__**${labels.commands.setHunger}**__`,
-        reactions: {
-            '0️⃣': 0,
-            '1️⃣': 1, 
-            '2️⃣': 2, 
-            '3️⃣': 3, 
-            '4️⃣': 4, 
-            '5️⃣': 5
-        },
-        scopes: [MessageScope.Storyteller, MessageScope.SetHunger],
-        button: setHungerButton
-    }
-];
-
-export function buildCommands(): CommandAction[] {
-    const result: CommandAction[] = [];
-
-    for (const command of defaultCommands) {
-        result.push(command);
-    }
-    
-    for (const key in characterManager.characters) {
-        const character = characterManager.characters[key];
-        result.push({
-            message: `__**${sprintf(labels.commands.changeCharacterOption, character.name)}**__`,
-            reactions: {
-                '🧛': key
-            },
-            scopes: [MessageScope.Storyteller, MessageScope.ChangeCharacter],
-            button: changeCharacterButton
-        });
-    }
-
-    return result;
+  action: CommandAction;
+  message?: string | Embed;
+  buttons?: Button[];
+  scopes?: MessageScope[];
 }

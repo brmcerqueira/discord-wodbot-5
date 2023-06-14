@@ -1,8 +1,8 @@
 import * as botData from "../botData.ts";
-import { Embed, MessageReaction, User } from "../deps.ts";
+import { Embed, Interaction } from "../deps.ts";
 import { labels } from "../i18n/labels.ts";
 
-export async function setDifficultyButton(_reaction: MessageReaction, _user: User, difficulty: number) {
+export async function setDifficultyButton(_interaction: Interaction, difficulty: number) {
     botData.setDifficulty(difficulty);  
     await botData.outputChannel.send(new Embed({
         title: labels.storytellerChangeDifficulty,

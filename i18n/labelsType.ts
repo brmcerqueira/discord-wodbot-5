@@ -39,7 +39,7 @@ export type LabelsType = {
         setHunger: string
     },
     log: {
-        emojiButtonEvent: string,
+        interactionCreateEvent: string,
         messageCreateEvent: string
     }
 }

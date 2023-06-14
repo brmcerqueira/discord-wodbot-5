@@ -1,6 +1,6 @@
 import * as characterManager from "../characterManager.ts";
-import { MessageReaction, User } from "../deps.ts";
+import { Interaction } from "../deps.ts";
 
-export async function reloadCharactersButton(_reaction: MessageReaction, _user: User, _value: string) {
+export async function reloadCharactersButton(_interaction: Interaction, _value: string) {
     await characterManager.load();
 }

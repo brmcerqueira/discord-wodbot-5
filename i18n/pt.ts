@@ -39,7 +39,7 @@ export const pt: LabelsType = {
         setHunger: "Ajustar fome do personagem"
     },
     log: {
-        emojiButtonEvent: "Emoji: %v - Message: %v - IsAdd: %v - Count: %v",
+        interactionCreateEvent: "Comando: %v - Opção: %v",
         messageCreateEvent: "Message: %v"
     }
 };
