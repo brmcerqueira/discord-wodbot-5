@@ -1,4 +1,4 @@
-import { ButtonStyle, Client, GatewayIntents, Interaction, InteractionMessageComponentData, InteractionResponseFlags, InteractionResponseType, InteractionType, Message, MessageComponentData, MessageComponentType, MessageReaction, TextChannel, User } from "./deps.ts";
+import { ButtonStyle, Client, GatewayIntents, Interaction, InteractionMessageComponentData, InteractionResponseType, InteractionType, Message, MessageComponentData, MessageComponentType,  TextChannel } from "./deps.ts";
 import { labels } from "./i18n/labels.ts";
 import { config } from "./config.ts";
 import { reRollButton } from "./buttons/reRollButton.ts";
