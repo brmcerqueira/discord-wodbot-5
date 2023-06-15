@@ -1,4 +1,4 @@
-import { ButtonStyle, Client, GatewayIntents, Interaction, InteractionMessageComponentData, InteractionResponseType, InteractionType, Message, MessageComponentData, MessageComponentType, TextChannel } from "./deps.ts";
+import { Client, GatewayIntents, Interaction, InteractionMessageComponentData, InteractionResponseType, InteractionType, Message, MessageComponentData, MessageComponentType, PDFDocument, TextChannel } from "./deps.ts";
 import { labels } from "./i18n/labels.ts";
 import { config } from "./config.ts";
 import { reRollButton } from "./buttons/reRollButton.ts";
@@ -10,6 +10,9 @@ import * as botData from "./botData.ts";
 import * as characterManager from "./characterManager.ts";
 import * as storyteller from "./storyteller.ts";
 import { Command, ReRoll } from "./command.ts";
+
+const character = await characterManager.getByPdf();
+logger.debug(character);
 
 await googleSheets.auth();
 await characterManager.load();
