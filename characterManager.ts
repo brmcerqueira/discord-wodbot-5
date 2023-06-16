@@ -4,8 +4,7 @@ import { config } from "./config.ts";
 import * as binds from "./characterBinds.ts";
 import { logger } from "./logger.ts";
 import { labels } from "./i18n/labels.ts";
-import { PDFDocument } from "./deps.ts";
-import { BulkString } from "https://deno.land/x/redis@v0.25.1/protocol/mod.ts";
+import { PDFDocument, PDFName } from "./deps.ts";
 
 export const characters: {
     [id: string]: Character
@@ -109,96 +108,87 @@ async function get(id: string): Promise<Character> {
 }
 
 export async function getByPdf(): Promise<Character> {
-    const pdfDoc = await PDFDocument.load(await Deno.readFile("./sheet.pdf"));
+    const pdfDoc = await PDFDocument.load(await Deno.readFile("./pdf/test.pdf"));
 
     const form = pdfDoc.getForm();
 
-    //remover codigo 
-    const fields = form.getFields()
-    fields.forEach((field: any) => {
-        const type = field.constructor.name
-        const name = field.getName()
-        console.log(`${type}: ${name}`)
-    })
-    //remover codigo
-
-    const bloodPotencyHigh = extract(form, "PotSan", 1, 5, undefined, ".1");
+    const bloodPotencyHigh = extract(form, "bloodPotency", 1, 5, ".high");
 
     return {
-        name: form.getTextField("Nome").getText(),
-        generation: extractDropdownSelected(form, "Geração_dropdown", i => i > 0 ? 17 - i : 0),
+        name: form.getTextField("name").getText() || "",
+        generation: extractDropdownSelected(form, "generation", i => i > 0 ? 17 - i : 0),
         attributes: {
             physical: {
-                strength: extract(form, "For", 1, 5),
-                dexterity: extract(form, "Des", 1, 5),
-                stamina: extract(form, "Vig", 1, 5)
+                strength: extract(form, "strength", 1, 5),
+                dexterity: extract(form, "dexterity", 1, 5),
+                stamina: extract(form, "stamina", 1, 5)
             },
             social: {
-                charisma: extract(form, "Car", 1, 5),
-                manipulation: extract(form, "Man", 1, 5),
-                composure: extract(form, "Aut", 1, 5)
+                charisma: extract(form, "charisma", 1, 5),
+                manipulation: extract(form, "manipulation", 1, 5),
+                composure: extract(form, "composure", 1, 5)
             },
             mental: {
-                intelligence: extract(form, "Int", 1, 5),
-                wits: extract(form, "Rac", 1, 5),
-                resolve: extract(form, "Det", 1, 5)
+                intelligence: extract(form, "intelligence", 1, 5),
+                wits: extract(form, "wits", 1, 5),
+                resolve: extract(form, "resolve", 1, 5)
             }
         },
         skills: {
             physical: {
-                athletics: extract(form, "HF", 1, 5, undefined, ".2"),
-                brawl: extract(form, "HF", 1, 5, undefined, ".3"),
-                craft: extract(form, "HF", 1, 5, undefined, ".7"),
-                drive: extract(form, "HF", 1, 5, undefined, ".4"),
-                firearms: extract(form, "HF", 1, 5, undefined, ".1"),
-                melee: extract(form, "HF", 1, 5, undefined, ".0"),
-                larceny: extract(form, "HF", 1, 5, undefined, ".6"),
-                stealth: extract(form, "HF", 1, 5, undefined, ".5"),
-                survival: extract(form, "HF", 1, 5, undefined, ".8")
+                athletics: extract(form, "physical", 1, 5, ".athletics"),
+                brawl: extract(form, "physical", 1, 5, ".brawl"),
+                craft: extract(form, "physical", 1, 5, ".craft"),
+                drive: extract(form, "physical", 1, 5, ".drive"),
+                firearms: extract(form, "physical", 1, 5, ".firearms"),
+                melee: extract(form, "physical", 1, 5, ".melee"),
+                larceny: extract(form, "physical", 1, 5, ".larceny"),
+                stealth: extract(form, "physical", 1, 5, ".stealth"),
+                survival: extract(form, "physical", 1, 5, ".survival")
             },
             social: {
-                animalKen: extract(form, "HS", 1, 5, undefined, ".0"),
-                etiquette: extract(form, "HS", 1, 5, undefined, ".1"),
-                insight: extract(form, "HS", 1, 5, undefined, ".7"),
-                intimidation: extract(form, "HS", 1, 5, undefined, ".2"),
-                leadership: extract(form, "HS", 1, 5, undefined, ".3"),
-                performance: extract(form, "HS", 1, 5, undefined, ".5"),
-                persuasion: extract(form, "HS", 1, 5, undefined, ".6"),
-                streetwise: extract(form, "HS", 1, 5, undefined, ".4"),
-                subterfuge: extract(form, "HS", 1, 5, undefined, ".8")
+                animalKen: extract(form, "social", 1, 5, ".animalKen"),
+                etiquette: extract(form, "social", 1, 5, ".etiquette"),
+                insight: extract(form, "social", 1, 5, ".insight"),
+                intimidation: extract(form, "social", 1, 5, ".intimidation"),
+                leadership: extract(form, "social", 1, 5, ".leadership"),
+                performance: extract(form, "social", 1, 5, ".performance"),
+                persuasion: extract(form, "social", 1, 5, ".persuasion"),
+                streetwise: extract(form, "social", 1, 5, ".streetwise"),
+                subterfuge: extract(form, "social", 1, 5, ".subterfuge")
             },
             mental: {
-                academics: extract(form, "HM", 1, 5, undefined, ".1"),
-                awareness: extract(form, "HM", 1, 5, undefined, ".6"),
-                finance: extract(form, "HM", 1, 5, undefined, ".2"),
-                investigation: extract(form, "HM", 1, 5, undefined, ".3"),
-                medicine: extract(form, "HM", 1, 5, undefined, ".4"),
-                occult: extract(form, "HM", 1, 5, undefined, ".5"),
-                politics: extract(form, "HM", 1, 5, undefined, ".7"),
-                science: extract(form, "HM", 1, 5, undefined, ".0"),
-                technology: extract(form, "HM", 1, 5, undefined, ".8")
+                academics: extract(form, "mental", 1, 5, ".academics"),
+                awareness: extract(form, "mental", 1, 5, ".awareness"),
+                finance: extract(form, "mental", 1, 5, ".finance"),
+                investigation: extract(form, "mental", 1, 5, ".investigation"),
+                medicine: extract(form, "mental", 1, 5, ".medicine"),
+                occult: extract(form, "mental", 1, 5, ".occult"),
+                politics: extract(form, "mental", 1, 5, ".politics"),
+                science: extract(form, "mental", 1, 5, ".science"),
+                technology: extract(form, "mental", 1, 5, ".technology")
             }
         },
         health: {
-            superficial: extract(form, "Vit", 1, 10),
+            superficial: extract(form, "health_superficial", 1, 10),
             aggravated: 0,
             penalty: 0
         },
         willpower: {
-            superficial: extract(form, "FV", 1, 10),
+            superficial: extract(form, "willpower_superficial", 1, 10),
             aggravated: 0,
             penalty: 0
         },
         humanity: {
-            total: extract(form, "Hum", 1, 10),
+            total: extract(form, "humanity_total", 1, 10),
             stains: 0
         },
         bloodPotency: bloodPotencyHigh > 0 ? bloodPotencyHigh + 5 :
-        extract(form, "PotSan", 1, 5, undefined, ".0"),
-        hunger: extract(form, "Fom", 1, 5),
+        extract(form, "bloodPotency", 1, 5, ".low"),
+        hunger: extract(form, "hunger", 1, 5),
         experience: {
-            total: parseInt(form.getTextField("XP.0").getText()) || 0,
-            spent: parseInt(form.getTextField("XP.1").getText()) || 0
+            total: parseInt(form.getTextField("experience.total").getText()) || 0,
+            spent: parseInt(form.getTextField("experience.spent").getText()) || 0
         }
     }
 }
@@ -249,9 +239,9 @@ async function updateValue(id: string, range: string, label: string, update: (va
     return value;
 }
 
-function extract(form: any, pre: string, min: number, max: number, middle?: string, end?: string): number {
+function extract(form: any, pre: string, min: number, max: number, end?: string): number {
     for (let index = max; index >= min; index--) {
-        if (form.getCheckBox(`${pre}${middle || ""}${index}${end || ""}`).isChecked()) {
+        if (form.getCheckBox(`${pre}_${index}${end || ""}`).isChecked()) {
             return index;
         }       
     }

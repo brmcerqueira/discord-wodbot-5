@@ -5,10 +5,26 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch Deno",
+            "name": "Bot",
             "request": "launch",
             "type": "node",
             "program": "main.ts",
+            "cwd": "${workspaceFolder}",
+            "runtimeExecutable": "deno",
+            "runtimeArgs": [
+                "run",
+                "--inspect-wait",
+                "--allow-all",
+                "--config",
+                "./tsconfig.json",
+            ],
+            "attachSimplePort": 9229
+        },
+        {
+            "name": "Edit PDF",
+            "request": "launch",
+            "type": "node",
+            "program": "pdf/editPdf.ts",
             "cwd": "${workspaceFolder}",
             "runtimeExecutable": "deno",
             "runtimeArgs": [
