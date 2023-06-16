@@ -22,6 +22,22 @@ function editRange(form: pdf.PDFForm, pre: string, neww: string, min: number, ma
     }
 }
 
+function createCheckBox(name: string, newName: string, x: number) {
+    for(let index = 1;index <= 10;index++) {
+      const origin = form.getField(`${name}_${index}`);
+      const field = form.createCheckBox(`${newName}_${index}`);
+  
+      const rectangle = (<pdf.PDFArray>origin.acroField.dict.get(pdf.PDFName.of("Rect"))).asRectangle();
+  
+      field.addToPage(pdfDoc.getPage(0), {
+        x: rectangle.x + x,
+        y: rectangle.y,
+        width: rectangle.width,
+        height: rectangle.height
+      });
+    }
+  }
+
 const pdfDoc = await pdf.PDFDocument.load(await Deno.readFile("./pdf/original.pdf"));
 
 const form = pdfDoc.getForm();
@@ -79,16 +95,17 @@ editRange(form, "HM", "politics", 1, 5, "mental", ".7");
 editRange(form, "HM", "science", 1, 5, "mental", ".0");
 editRange(form, "HM", "technology", 1, 5, "mental", ".8");
 
-editRange(form, "Vit", "health_superficial", 1, 10);
-editRange(form, "FV", "willpower_superficial", 1, 10);
+editRange(form, "Vit", "health_aggravated", 1, 10);
+editRange(form, "FV", "willpower_aggravated", 1, 10);
 editRange(form, "Hum", "humanity_total", 1, 10);
 editRange(form, "Fom", "hunger", 1, 5);
 
+createCheckBox("health_aggravated", "health_superficial", -120);
+createCheckBox("willpower_aggravated", "willpower_superficial", 120);
+
 await Deno.writeFile("./pdf/template.pdf", await pdfDoc.save({updateFieldAppearances: false}));
 
-const fields = form.getFields();
-
-fields.forEach(field => {
+form.getFields().forEach(field => {
     const type = field.constructor.name;
     const name = field.getName();
     console.log(`${type}: ${name}`);
