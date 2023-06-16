@@ -1,13 +1,12 @@
-import { PDFDocument } from "../deps.ts";
+import { pdf } from "../deps.ts";
 
-
-function editRange(form: any, pre: string, neww: string, min: number, max: number, group?: string, end?: string) {
+function editRange(form: pdf.PDFForm, pre: string, neww: string, min: number, max: number, group?: string, end?: string) {
     for (let index = min; index <= max; index++) {
-        let field: any;
+        let field: pdf.PDFField;
 
         try {
             field = form.getField(`${pre}${index}${end || ""}`);
-        } catch (error) {
+        } catch (_error) {
             field = form.getField(`${group}_${index}${end || ""}`);
         }
 
@@ -23,7 +22,7 @@ function editRange(form: any, pre: string, neww: string, min: number, max: numbe
     }
 }
 
-const pdfDoc = await PDFDocument.load(await Deno.readFile("./pdf/original.pdf"));
+const pdfDoc = await pdf.PDFDocument.load(await Deno.readFile("./pdf/original.pdf"));
 
 const form = pdfDoc.getForm();
 
@@ -36,7 +35,7 @@ editRange(form, "PotSan", "high", 1, 5, "bloodPotency", ".1");
 const experienceTotal = form.getField('XP.0').acroField;
 experienceTotal.setPartialName("total");
 form.getField('XP.1').acroField.setPartialName("spent");
-experienceTotal.getParent().setPartialName("experience");
+experienceTotal!.getParent()!.setPartialName("experience");
 
 editRange(form, "For", "strength", 1, 5);
 editRange(form, "Des", "dexterity", 1, 5);
@@ -89,8 +88,8 @@ await Deno.writeFile("./pdf/template.pdf", await pdfDoc.save({updateFieldAppeara
 
 const fields = form.getFields();
 
-fields.forEach((field: any) => {
-    const type = field.constructor.name
-    const name = field.getName()
-    console.log(`${type}: ${name}`)
-})
+fields.forEach(field => {
+    const type = field.constructor.name;
+    const name = field.getName();
+    console.log(`${type}: ${name}`);
+});

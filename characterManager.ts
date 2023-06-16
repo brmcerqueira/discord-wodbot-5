@@ -4,7 +4,7 @@ import { config } from "./config.ts";
 import * as binds from "./characterBinds.ts";
 import { logger } from "./logger.ts";
 import { labels } from "./i18n/labels.ts";
-import { PDFDocument, PDFName } from "./deps.ts";
+import { pdf } from "./deps.ts";
 
 export const characters: {
     [id: string]: Character
@@ -108,7 +108,7 @@ async function get(id: string): Promise<Character> {
 }
 
 export async function getByPdf(): Promise<Character> {
-    const pdfDoc = await PDFDocument.load(await Deno.readFile("./pdf/test.pdf"));
+    const pdfDoc = await pdf.PDFDocument.load(await Deno.readFile("./pdf/test.pdf"));
 
     const form = pdfDoc.getForm();
 
@@ -187,8 +187,8 @@ export async function getByPdf(): Promise<Character> {
         extract(form, "bloodPotency", 1, 5, ".low"),
         hunger: extract(form, "hunger", 1, 5),
         experience: {
-            total: parseInt(form.getTextField("experience.total").getText()) || 0,
-            spent: parseInt(form.getTextField("experience.spent").getText()) || 0
+            total: parseInt(form.getTextField("experience.total").getText()!) || 0,
+            spent: parseInt(form.getTextField("experience.spent").getText()!) || 0
         }
     }
 }
