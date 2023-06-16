@@ -23,20 +23,28 @@ function editRange(form: pdf.PDFForm, pre: string, neww: string, min: number, ma
 }
 
 function createCheckBox(name: string, newName: string, x: number) {
-    for(let index = 1;index <= 10;index++) {
-      const origin = form.getField(`${name}_${index}`);
-      const field = form.createCheckBox(`${newName}_${index}`);
-  
-      const rectangle = (<pdf.PDFArray>origin.acroField.dict.get(pdf.PDFName.of("Rect"))).asRectangle();
-  
-      field.addToPage(pdfDoc.getPage(0), {
-        x: rectangle.x + x,
-        y: rectangle.y,
-        width: rectangle.width,
-        height: rectangle.height
-      });
+    for (let index = 1; index <= 10; index++) {
+        const origin = form.getCheckBox(`${name}_${index}`);
+        const field = form.createCheckBox(`${newName}_${index}`);
+
+        /*
+        const dict = origin.acroField.dict.clone();
+        const ref = pdfDoc.context.register(dict);
+        const checkBox = pdf.PDFAcroCheckBox.fromDict(dict, ref);
+        checkBox.setPartialName(`${newName}_${index}`);
+        const field = pdf.PDFCheckBox.of(checkBox, ref, pdfDoc); 
+        */
+
+        const rectangle = (<pdf.PDFArray>origin.acroField.dict.get(pdf.PDFName.of("Rect"))).asRectangle();
+
+        field.addToPage(pdfDoc.getPage(0), {
+            x: rectangle.x + x,
+            y: rectangle.y,
+            width: rectangle.width,
+            height: rectangle.height
+        });
     }
-  }
+}
 
 const pdfDoc = await pdf.PDFDocument.load(await Deno.readFile("./pdf/original.pdf"));
 
@@ -103,7 +111,7 @@ editRange(form, "Fom", "hunger", 1, 5);
 createCheckBox("health_aggravated", "health_superficial", -120);
 createCheckBox("willpower_aggravated", "willpower_superficial", 120);
 
-await Deno.writeFile("./pdf/template.pdf", await pdfDoc.save({updateFieldAppearances: false}));
+await Deno.writeFile("./pdf/template.pdf", await pdfDoc.save({ updateFieldAppearances: false }));
 
 form.getFields().forEach(field => {
     const type = field.constructor.name;
