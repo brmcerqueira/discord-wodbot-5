@@ -1,5 +1,45 @@
 import { pdf } from "../deps.ts";
 
+const x = 4;
+const y = 4;
+const width = 7;
+const height = 7;
+const borderWidth = 0.8;
+
+const checkBoxFillDrawing = pdf.drawRectangle({
+    x: x,
+    y: y,
+    width: width,
+    height: height,
+    borderWidth: borderWidth,
+    color: pdf.rgb(0, 0, 0),
+    borderColor: pdf.rgb(0, 0, 0),
+    rotate: pdf.degrees(0),
+    xSkew: pdf.degrees(0),
+    ySkew: pdf.degrees(0),
+});
+
+const checkBoxDrawing = pdf.drawRectangle({
+    x: x,
+    y: y,
+    width: width,
+    height: height,
+    borderWidth: borderWidth,
+    color: pdf.rgb(1, 1, 1),
+    borderColor: pdf.rgb(0, 0, 0),
+    rotate: pdf.degrees(0),
+    xSkew: pdf.degrees(0),
+    ySkew: pdf.degrees(0),
+});
+
+const checkMarkDrawing = pdf.drawCheckMark({
+    x: 7.5,
+    y: 7.5,
+    size: 4,
+    thickness: 1,
+    color: pdf.rgb(0, 0, 0)
+});
+
 function editRange(form: pdf.PDFForm, pre: string, neww: string, min: number, max: number, group?: string, end?: string) {
     for (let index = min; index <= max; index++) {
         let field: pdf.PDFField;
@@ -22,26 +62,22 @@ function editRange(form: pdf.PDFForm, pre: string, neww: string, min: number, ma
     }
 }
 
-function createCheckBox(name: string, newName: string, x: number) {
+function createCheckBoxes(name: string, newName: string, adjust: number) {
     for (let index = 1; index <= 10; index++) {
         const origin = form.getCheckBox(`${name}_${index}`);
         const field = form.createCheckBox(`${newName}_${index}`);
 
-        /*
-        const dict = origin.acroField.dict.clone();
-        const ref = pdfDoc.context.register(dict);
-        const checkBox = pdf.PDFAcroCheckBox.fromDict(dict, ref);
-        checkBox.setPartialName(`${newName}_${index}`);
-        const field = pdf.PDFCheckBox.of(checkBox, ref, pdfDoc); 
-        */
-
-        const rectangle = (<pdf.PDFArray>origin.acroField.dict.get(pdf.PDFName.of("Rect"))).asRectangle();
+        const position = (<pdf.PDFArray>origin.acroField.dict.get(pdf.PDFName.of("Rect"))).asRectangle();
 
         field.addToPage(pdfDoc.getPage(0), {
-            x: rectangle.x + x,
-            y: rectangle.y,
-            width: rectangle.width,
-            height: rectangle.height
+            x: position.x,
+            y: position.y + adjust,
+            width: position.width,
+            height: position.height
+        });
+
+        field.updateAppearances(() => {
+            return { on: [...checkBoxDrawing, ...checkMarkDrawing], off: [...checkBoxDrawing] };
         });
     }
 }
@@ -108,8 +144,9 @@ editRange(form, "FV", "willpower_aggravated", 1, 10);
 editRange(form, "Hum", "humanity_total", 1, 10);
 editRange(form, "Fom", "hunger", 1, 5);
 
-createCheckBox("health_aggravated", "health_superficial", -120);
-createCheckBox("willpower_aggravated", "willpower_superficial", 120);
+createCheckBoxes("health_aggravated", "health_superficial", -10);
+createCheckBoxes("willpower_aggravated", "willpower_superficial", -10);
+createCheckBoxes("humanity_total", "humanity_stains", 10);
 
 await Deno.writeFile("./pdf/template.pdf", await pdfDoc.save({ updateFieldAppearances: false }));
 

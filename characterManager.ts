@@ -171,17 +171,17 @@ export async function getByPdf(): Promise<Character> {
         },
         health: {
             superficial: extract(form, "health_superficial", 1, 10),
-            aggravated: 0,
+            aggravated: extract(form, "health_aggravated", 1, 10),
             penalty: 0
         },
         willpower: {
             superficial: extract(form, "willpower_superficial", 1, 10),
-            aggravated: 0,
+            aggravated: extract(form, "willpower_aggravated", 1, 10),
             penalty: 0
         },
         humanity: {
             total: extract(form, "humanity_total", 1, 10),
-            stains: 0
+            stains: extract(form, "humanity_stains", 1, 10)
         },
         bloodPotency: bloodPotencyHigh > 0 ? bloodPotencyHigh + 5 :
         extract(form, "bloodPotency", 1, 5, ".low"),
