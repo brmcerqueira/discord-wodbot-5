@@ -8,7 +8,7 @@ export type ConfigDef = {
     dicePoolsChannelId: string,
     storytellerChannelId: string,
     outputChannelId: string,
-    googleSheets: {
+    googleDrive: {
         clientId: string,
         clientSecret: string,
         apiKey: string
