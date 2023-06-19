@@ -4,7 +4,6 @@ export type DicePoolType = {
 }
 
 export type LabelsType = {
-    urlAuth: string,
     authSuccess: string,
     closeThisFlap: string,
     welcome: string,
@@ -26,7 +25,6 @@ export type LabelsType = {
     updateExperienceSuccess: string,
     updateHungerSuccess: string,
     currentCharacter: string,
-    jsonResponseError: string,
     loading: string,
     dicePools: {
         attackWithFists: DicePoolType

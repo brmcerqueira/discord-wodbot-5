@@ -2,16 +2,16 @@ import { Client, GatewayIntents, Interaction, InteractionMessageComponentData, I
 import { labels } from "./i18n/labels.ts";
 import { config } from "./config.ts";
 import { reRollButton } from "./buttons/reRollButton.ts";
-import * as googleDrive from "./googleDrive.ts";
 import { logger } from "./logger.ts";
 import * as dicePools from "./dicePools.ts";
+import * as characterServe from "./characterServe.ts";
 import { rollAction } from "./actions/rollAction.ts";
 import * as botData from "./botData.ts";
 import * as characterManager from "./characterManager.ts";
 import * as storyteller from "./storyteller.ts";
 import { Command, ReRoll } from "./command.ts";
 
-await googleDrive.auth();
+characterServe.start();
 await characterManager.load();
 
 const storytellerCommands = storyteller.buildCommands();
@@ -100,7 +100,7 @@ const regExpActions: RegExpAction[] = [{
 client.on('ready', async () => {
   logger.info(labels.loading);
   await client.users.fetch(config.storytellerId);
-  for (const id of Object.keys(config.playerCharacters)) {
+  for (const id of Object.keys(characterManager.users)) {
     await client.users.fetch(id);
   }
   botData.setOutputChannel((await client.channels.fetch(config.outputChannelId))!);

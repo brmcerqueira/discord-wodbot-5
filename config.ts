@@ -7,16 +7,7 @@ export type ConfigDef = {
     storytellerId: string,
     dicePoolsChannelId: string,
     storytellerChannelId: string,
-    outputChannelId: string,
-    googleDrive: {
-        clientId: string,
-        clientSecret: string,
-        apiKey: string
-    },
-    playerCharacters: { 
-        [key: string]: string
-    },
-    storytellerCharacters: string[]
+    outputChannelId: string
 }
 
 const path = Deno.env.get("DISCORD_WODBOT_CONFIG_PATH");

@@ -6,11 +6,11 @@ import * as botData from "../botData.ts";
 import { Interaction } from "../deps.ts";
 
 export async function dicePoolButton(interaction: Interaction, dicePool: DicePool) {  
-    const spreadSheetId = config.storytellerId == interaction.user.id 
-    ? botData.storytellerSpreadSheetId
-    : config.playerCharacters[interaction.user.id];
-    if (spreadSheetId) { 
-        const character = characterManager.characters[spreadSheetId];
+    const id = config.storytellerId == interaction.user.id 
+    ? botData.storytellerCurrentCharacterId
+    : characterManager.users[interaction.user.id];
+    if (id) { 
+        const character = characterManager.characters[id];
         const result = dicePool.action(character);
         await rollHelper(botData.outputChannel, 
             interaction.user.id, 

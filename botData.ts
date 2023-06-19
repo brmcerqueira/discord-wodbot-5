@@ -43,13 +43,11 @@ export function setDifficulty(value: number | null) {
     difficulty = value;
 }
 
-export let storytellerSpreadSheetId: string =
-    config.storytellerCharacters.length > 0 ? config.storytellerCharacters[0] : 
-    (Object.values(config.playerCharacters).length > 0 ? Object.values(config.playerCharacters)[0] : "");
+export let storytellerCurrentCharacterId: string = "";
 
-export async function setStorytellerSpreadSheetId(value: string) {
-    storytellerSpreadSheetId = value;
-    const character = characterManager.characters[storytellerSpreadSheetId];
+export async function setStorytellerCurrentCharacterId(value: string) {
+    storytellerCurrentCharacterId = value;
+    const character = characterManager.characters[storytellerCurrentCharacterId];
     await currentCharacterMessage.edit(buildCurrentCharacterEmbed(character.name));
     logger.info(labels.changeCharacterSuccess, character.name);
 }
@@ -76,8 +74,9 @@ export function buildId(index: number, ...scopes: CommandScope[]): string {
 }
 
 export async function buildCurrentCharacterMessage(storytellerChannel: TextChannel) {
-    const character: Character | undefined = characterManager.characters[storytellerSpreadSheetId];
-    currentCharacterMessage = await storytellerChannel.send(buildCurrentCharacterEmbed(character?.name || ''));
+    storytellerCurrentCharacterId = Object.keys(characterManager.characters)[0];
+    currentCharacterMessage = await storytellerChannel.send(buildCurrentCharacterEmbed(
+        storytellerCurrentCharacterId != "" ? characterManager.characters[storytellerCurrentCharacterId]!.name : ""));
 }
 
 export function buildCurrentCharacterEmbed(name: string): Embed {
