@@ -1,3 +1,5 @@
+import { charactersPath, outPath } from "./config.ts";
+
 const etags: {
     [id: string]: string
 } = {};
@@ -37,7 +39,7 @@ export async function start(): Promise<void> {
 
                     etags[id] = headers.ETag;
 
-                    await event.respondWith(new Response(await Deno.readFile(`./out/${id}.pdf`), {
+                    await event.respondWith(new Response(await Deno.readFile(`${outPath}/${id}.pdf`), {
                         status: 200,
                         headers: headers
                     }));
@@ -55,13 +57,13 @@ export async function start(): Promise<void> {
 export async function buildLightPdf(userId: string, file: string) {
     await Deno.run({ cmd: ["ghostscript",
     "-sDEVICE=pdfwrite",
-    "-dCompatibilityLevel=1.4",
+    "-dCompatibilityLevel=1.6",
     "-dPDFSETTINGS=/printer",
     "-dNOPAUSE",
     "-dQUIET",
     "-dBATCH",
-    `-sOutputFile=./out/${userId}.pdf`,
-    `./characters/${file}`] 
+    `-sOutputFile=${outPath}/${userId}.pdf`,
+    `${charactersPath}/${file}`] 
     }).status();
     delete etags[userId];
 }

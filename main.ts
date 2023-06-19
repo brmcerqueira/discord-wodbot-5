@@ -13,6 +13,7 @@ import { Command, ReRoll } from "./command.ts";
 
 characterServe.start();
 await characterManager.load();
+characterManager.watch();
 
 const storytellerCommands = storyteller.buildCommands();
 

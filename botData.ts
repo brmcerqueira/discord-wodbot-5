@@ -5,7 +5,6 @@ import { labels } from "./i18n/labels.ts";
 import * as characterManager from "./characterManager.ts";
 import { CommandScope, Storyteller, allScopes } from "./command.ts";
 import { logger } from "./logger.ts";
-import { Character } from "./character.ts";
 
 export type CustomId = { index: number, scopes?: CommandScope[] };
 
@@ -76,7 +75,7 @@ export function buildId(index: number, ...scopes: CommandScope[]): string {
 export async function buildCurrentCharacterMessage(storytellerChannel: TextChannel) {
     storytellerCurrentCharacterId = Object.keys(characterManager.characters)[0];
     currentCharacterMessage = await storytellerChannel.send(buildCurrentCharacterEmbed(
-        storytellerCurrentCharacterId != "" ? characterManager.characters[storytellerCurrentCharacterId]!.name : ""));
+        storytellerCurrentCharacterId != "" ? characterManager.characters[storytellerCurrentCharacterId]?.name : "-"));
 }
 
 export function buildCurrentCharacterEmbed(name: string): Embed {
