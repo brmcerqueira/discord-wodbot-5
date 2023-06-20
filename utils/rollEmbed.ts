@@ -63,5 +63,13 @@ export function rollEmbed(result: RollResult, authorId: string, title?: string):
         inline: true
     }];
 
+    if (result.modifier != 0) {
+        embed.fields.splice(2, 0, {
+            name: labels.modifier,
+            value: result.modifier.toString(),
+            inline: true
+        });
+    }
+
     return new Embed(embed);
 }

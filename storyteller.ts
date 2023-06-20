@@ -2,12 +2,10 @@ import { labels } from "./i18n/labels.ts";
 import { setDifficultyButton } from "./buttons/setDifficultyButton.ts";
 import { reloadCharactersButton } from "./buttons/reloadCharactersButton.ts";
 import * as characterManager from "./characterManager.ts";
-import { addExperienceButton } from "./buttons/addExperienceButton.ts";
-import { decreaseExperienceButton } from "./buttons/decreaseExperienceButton.ts";
 import { ButtonStyle, sprintf } from "./deps.ts";
-import { setHungerButton } from "./buttons/setHungerButton.ts";
-import { AddExperience, Button, ChangeCharacter, Command, DecreaseExperience, ReloadCharacters, SetDifficulty, SetHunger, Storyteller, createCommandScope } from "./command.ts";
+import { Button, ChangeCharacter, Command, ReloadCharacters, SetBonus, SetDifficulty, SetOnus, Storyteller, createCommandScope } from "./command.ts";
 import { characterButton } from "./buttons/characterButton.ts";
+import { setModifierButton } from "./buttons/setModifierButton.ts";
 
 const defaultCommands: Command[] = [
     {
@@ -91,7 +89,7 @@ const defaultCommands: Command[] = [
         action: setDifficultyButton
     },
     {
-        message: `__**${labels.commands.addExperience}**__`,
+        message: `__**${labels.commands.setBonus}**__`,
         buttons: [
             {
                 style: ButtonStyle.SECONDARY,
@@ -156,125 +154,77 @@ const defaultCommands: Command[] = [
                 },
                 value: 9
             }],
-        scopes: [Storyteller, AddExperience],
-        action: addExperienceButton
+        scopes: [Storyteller, SetBonus],
+        action: setModifierButton
     },
     {
-        message: `__**${labels.commands.decreaseExperience}**__`,
+        message: `__**${labels.commands.setOnus}**__`,
         buttons: [
             {
                 style: ButtonStyle.SECONDARY,
                 emoji: {
                     name: '1️⃣'
                 },
-                value: 1
+                value: -1
             },
             {
                 style: ButtonStyle.SECONDARY,
                 emoji: {
                     name: '2️⃣'
                 },
-                value: 2
+                value: -2
             },
             {
                 style: ButtonStyle.SECONDARY,
                 emoji: {
                     name: '3️⃣'
                 },
-                value: 3
+                value: -3
             },
             {
                 style: ButtonStyle.SECONDARY,
                 emoji: {
                     name: '4️⃣'
                 },
-                value: 4
+                value: -4
             },
             {
                 style: ButtonStyle.SECONDARY,
                 emoji: {
                     name: '5️⃣'
                 },
-                value: 5
+                value: -5
             },
             {
                 style: ButtonStyle.SECONDARY,
                 emoji: {
                     name: '6️⃣'
                 },
-                value: 6
+                value: -6
             },
             {
                 style: ButtonStyle.SECONDARY,
                 emoji: {
                     name: '7️⃣'
                 },
-                value: 7
+                value: -7
             },
             {
                 style: ButtonStyle.SECONDARY,
                 emoji: {
                     name: '8️⃣'
                 },
-                value: 8
+                value: -8
             },
             {
                 style: ButtonStyle.SECONDARY,
                 emoji: {
                     name: '9️⃣'
                 },
-                value: 9
+                value: -9
             }],
-        scopes: [Storyteller, DecreaseExperience],
-        action: decreaseExperienceButton
-    },
-    {
-        message: `__**${labels.commands.setHunger}**__`,
-        buttons: [
-            {
-                style: ButtonStyle.SECONDARY,
-                emoji: {
-                    name: '0️⃣'
-                },
-                value: 0
-            },
-            {
-                style: ButtonStyle.SECONDARY,
-                emoji: {
-                    name: '1️⃣'
-                },
-                value: 1
-            },
-            {
-                style: ButtonStyle.SECONDARY,
-                emoji: {
-                    name: '2️⃣'
-                },
-                value: 2
-            },
-            {
-                style: ButtonStyle.SECONDARY,
-                emoji: {
-                    name: '3️⃣'
-                },
-                value: 3
-            },
-            {
-                style: ButtonStyle.SECONDARY,
-                emoji: {
-                    name: '4️⃣'
-                },
-                value: 4
-            },
-            {
-                style: ButtonStyle.SECONDARY,
-                emoji: {
-                    name: '5️⃣'
-                },
-                value: 5
-            }],
-        scopes: [Storyteller, SetHunger],
-        action: setHungerButton
+        scopes: [Storyteller, SetOnus],
+        action: setModifierButton
     }
 ];
 

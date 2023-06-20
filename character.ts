@@ -5,6 +5,7 @@ export type Damage = {
 }
 
 export type Character = {
+    dateTime: Date;
     name: string;
     generation: number;
     attributes: {

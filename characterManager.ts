@@ -8,51 +8,50 @@ import { charactersPath } from "./config.ts";
 const margin = 5000;
 
 export const characters: {
-    [id: string]: Character
+  [id: string]: Character
 } = {};
 
 export const users: {
-    [id: string]: string
-} = {};
-
-const documents: {
-    [id: string]: { document: pdf.PDFDocument, file: string, dateTime: Date }
+  [id: string]: string
 } = {};
 
 export async function load(): Promise<void> {
-    for await (const entry of Deno.readDir(charactersPath)) {
-        if (entry.isFile && entry.name.endsWith(".pdf")) {
-            await loadCharacter(entry.name, base64.encode(entry.name));      
-        }
+  for await (const entry of Deno.readDir(charactersPath)) {
+    if (entry.isFile && entry.name.endsWith(".pdf")) {
+      await loadCharacter(entry.name, base64.encode(entry.name));
     }
+  }
 }
 
 export async function watch(): Promise<void> {
-    for await (const event of Deno.watchFs(charactersPath, { recursive: false })) {
-        if (event.kind == "create" || event.kind == "modify") {
-            for (const file of event.paths.map(p => path.parse(p))) {
-                if (file.ext == ".pdf") {  
-                    const id = base64.encode(file.base); 
-                    if (!documents[id] 
-                        || (documents[id] && (new Date().getTime() - documents[id].dateTime.getTime()) > margin)) {
-                        await loadCharacter(file.base, id); 
-                    }                                              
-                }
-            }
+  for await (const event of Deno.watchFs(charactersPath, { recursive: false })) {
+    if (event.kind == "create" || event.kind == "modify") {
+      for (const file of event.paths.map(p => path.parse(p))) {
+        if (file.ext == ".pdf") {
+          const id = base64.encode(file.base);
+          if (!characters[id]
+            || (characters[id] && (new Date().getTime() - characters[id].dateTime.getTime()) > margin)) {
+            await loadCharacter(file.base, id);
+          }
         }
+      }
     }
+  }
 }
 
 async function loadCharacter(file: string, id: string) {
+  const dateTime = new Date();
+
   const arrayBuffer = await Deno.readFile(`${charactersPath}/${file}`);
 
-  documents[id] = { document: await pdf.PDFDocument.load(arrayBuffer), file, dateTime: new Date() };
+  const document = await pdf.PDFDocument.load(arrayBuffer);
 
-  const form = documents[id].document.getForm();
+  const form = document.getForm();
 
   const bloodPotencyHigh = extract(form, "bloodPotency", 1, 5, ".high");
 
   const character: Character = {
+    dateTime: dateTime,
     name: form.getTextField("name").getText() || "",
     generation: extractDropdownSelected(form, "generation", i => i > 0 ? 17 - i : 0),
     attributes: {
@@ -130,40 +129,18 @@ async function loadCharacter(file: string, id: string) {
     }
   };
 
-  logger.info(labels.loadCharacterSuccess, character.name);
-
   characters[id] = character;
 
   const userIdStart = file.lastIndexOf('[');
   const userIdEnd = file.lastIndexOf(']');
 
-  if(userIdStart > -1 && userIdEnd > -1 && userIdStart < userIdEnd) {
+  if (userIdStart > -1 && userIdEnd > -1 && userIdStart < userIdEnd) {
     const userId = file.substring(userIdStart + 1, userIdEnd);
     users[userId] = id;
     await buildLightPdf(userId, file);
   }
-}
 
-export async function updateExperience(id: string, update: (value: number) => number): Promise<void> {
-    let value = 0;
-    const character = characters[id];
-    await updatePdf(id, form => {
-        value = update(character.experience.total);
-        form.getTextField("experience.total").setText(value.toString());
-    })
-    logger.info(labels.updateExperienceSuccess, character.name, value);
-    character.experience.total = value;
-}
-
-export async function updateHunger(id: string, update: (value: number) => number): Promise<void> {
-    let value = 0;
-    const character = characters[id];
-    await updatePdf(id, form => {
-        value = update(character.hunger);
-        updateCheckBoxes(form, "hunger", 1, 5, value);
-    })
-    logger.info(labels.updateHungerSuccess, character.name, value);
-    character.hunger = value;
+  logger.info(labels.loadCharacterSuccess, character.name);
 }
 
 export function getUserIdByCharacterId(characterId: string): string | undefined {
@@ -171,53 +148,28 @@ export function getUserIdByCharacterId(characterId: string): string | undefined 
   return pair?.[0];
 }
 
-async function updatePdf(id: string, update: (form: pdf.PDFForm) => void) {
-    const pair = documents[id];
-    const document = pair.document;
-    update(document.getForm());
-    const userId = getUserIdByCharacterId(id);
-    pair.file = `${characters[id].name}${userId ? `[${userId}]` : ""}.pdf`;
-    await Deno.writeFile(`${charactersPath}/${pair.file}`,
-    await document.save({ updateFieldAppearances: false }));
-    if (userId) {
-        await buildLightPdf(userId, pair.file);
-    }
-}
-
 function extract(form: pdf.PDFForm, prefix: string, min: number, max: number, suffix?: string): number {
-    for (let index = max; index >= min; index--) {
-        if (form.getCheckBox(`${prefix}_${index}${suffix || ""}`).isChecked()) {
-            return index;
-        }
+  for (let index = max; index >= min; index--) {
+    if (form.getCheckBox(`${prefix}_${index}${suffix || ""}`).isChecked()) {
+      return index;
     }
-    return 0;
+  }
+  return 0;
 }
 
 function extractDropdownSelected(form: pdf.PDFForm, name: string, parseResult?: (i: number) => number): number {
-    const dropdown = form.getDropdown(name);
-    const options: string[] = dropdown.getOptions();
-    const selected: string[] = dropdown.getSelected();
+  const dropdown = form.getDropdown(name);
+  const options: string[] = dropdown.getOptions();
+  const selected: string[] = dropdown.getSelected();
 
-    let result = -1;
+  let result = -1;
 
-    for (let index = 0; index < options.length; index++) {
-        if (selected.indexOf(options[index]) > -1) {
-            result = index;
-            break;
-        }
+  for (let index = 0; index < options.length; index++) {
+    if (selected.indexOf(options[index]) > -1) {
+      result = index;
+      break;
     }
+  }
 
-    return parseResult ? parseResult(result) : result;
-}
-
-function updateCheckBoxes(form: pdf.PDFForm, prefix: string, min: number, max: number, value: number, suffix?: string) {
-    for (let index = min; index <= max; index++) {
-        const checkBox = form.getCheckBox(`${prefix}_${index}${suffix || ""}`);
-        if (index <= value) {
-            checkBox.check();
-        }
-        else {
-            checkBox.uncheck();
-        }
-    }
+  return parseResult ? parseResult(result) : result;
 }

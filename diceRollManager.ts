@@ -1,5 +1,6 @@
 export type RollResult = {
   amount: number,
+  modifier: number,
   hunger: number
   difficulty: number,
   successes: number,
@@ -20,17 +21,18 @@ export enum RollStatus {
   MessyCritical
 }
 
-export function roll(amount: number, hunger: number, difficulty: number): RollResult {
+export function roll(amount: number, hunger: number, difficulty: number, modifier: number): RollResult {
   const dices: DiceResult[] = [];
 
-  for (let i = 0; i < amount; i++) {
-    dices.push(throwDice(i < hunger));
+  for (let i = 1; i <= amount; i++) {
+    dices.push(throwDice(i <= hunger));
   }
 
   const computed = computedRoll(dices, difficulty);
 
   return {
     amount,
+    modifier,
     hunger,
     difficulty,
     successes: computed.successes,
@@ -54,6 +56,7 @@ export function reRoll(result: RollResult, amount: number): RollResult {
 
   return {
     amount: result.amount,
+    modifier: result.modifier,
     hunger: result.hunger,
     difficulty: result.difficulty,
     successes: computed.successes,

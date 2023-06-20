@@ -38,10 +38,9 @@ export function createCommandScope(): CommandScope {
 
 export const Storyteller = createCommandScope();
 export const SetDifficulty = createCommandScope();
+export const SetBonus = createCommandScope();
+export const SetOnus = createCommandScope();
 export const ReloadCharacters = createCommandScope();
 export const ChangeCharacter = createCommandScope();
-export const AddExperience = createCommandScope();
-export const DecreaseExperience = createCommandScope();
-export const SetHunger = createCommandScope();
 export const ReRoll = createCommandScope();
 export const DicePool = createCommandScope();

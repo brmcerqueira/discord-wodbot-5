@@ -16,7 +16,16 @@ export async function rollHelper(channel: TextChannel,
         botData.setDifficulty(null);
     }
 
-    const result = roll(dices, hunger, difficulty);
+    let modifier = 0;
+
+    if (botData.modifier) {
+        modifier = botData.modifier;
+        botData.setModifier(null);
+    }
+
+    dices += modifier;
+
+    const result = roll(dices, hunger, difficulty, modifier);
 
     const margin = dices - hunger;
 

@@ -42,6 +42,12 @@ export function setDifficulty(value: number | null) {
     difficulty = value;
 }
 
+export let modifier: number | null = null;
+
+export function setModifier(value: number | null) {
+    modifier = value;
+}
+
 export let storytellerCurrentCharacterId: string = "";
 
 export async function setStorytellerCurrentCharacterId(value: string) {

@@ -8,6 +8,7 @@ export type LabelsType = {
     welcome: string,
     dices: string,
     difficulty: string,
+    modifier: string,
     successes: string,
     status: string,
     player: string, 
@@ -19,10 +20,9 @@ export type LabelsType = {
     reRollHelperText: string,
     configNotFound: string,
     storytellerChangeDifficulty: string,
+    storytellerChangeModifier: string,
     changeCharacterSuccess: string,
     loadCharacterSuccess: string,
-    updateExperienceSuccess: string,
-    updateHungerSuccess: string,
     currentCharacter: string,
     loading: string,
     openYourCharacter: string,
@@ -31,11 +31,10 @@ export type LabelsType = {
     },
     commands: {
         setDifficulty: string,
+        setBonus: string,
+        setOnus: string,
         reloadCharacters: string,
-        addExperience: string,
-        decreaseExperience: string,
         characterManager: string,
-        setHunger: string
     },
     log: {
         interactionCreateEvent: string,

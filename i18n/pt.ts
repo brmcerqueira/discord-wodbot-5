@@ -5,6 +5,7 @@ export const pt: LabelsType = {
     welcome: "Wodbot 5.0 entrou!",
     dices: "Dados",
     difficulty: "Dificuldade",
+    modifier: "Modificador",
     successes: "Sucessos",
     status: "Status",
     player: "Jogador",
@@ -16,10 +17,9 @@ export const pt: LabelsType = {
     reRollHelperText: "Re-rolando %v dado(s) da última jogada...",
     configNotFound: "Nenhum arquivo de configuração encontrado.",
     storytellerChangeDifficulty: "O narrador mudou a dificuldade.",
+    storytellerChangeModifier: "O narrador mudou o modificador.",
     changeCharacterSuccess: "Novo personagem selecionado: %v",
     loadCharacterSuccess: "Personagem atualizado: %v",
-    updateExperienceSuccess: "O personagem '%v' teve a experiência atualizada para: %v",
-    updateHungerSuccess: "O personagem '%v' teve a fome atualizada para: %v",
     currentCharacter: "Personagem selecionado",
     loading: "Carregando...",
     openYourCharacter: "Abra sua ficha clicando no link!",
@@ -31,11 +31,10 @@ export const pt: LabelsType = {
     },
     commands: {
         setDifficulty: "Alterar dificuldade",
+        setBonus: "Inserir uma bonificação",
+        setOnus: "Inserir uma penalidade",
         reloadCharacters: "Recarregar personagens",
-        addExperience: "Aumentar experiência do personagem",
-        decreaseExperience: "Remover experiência do personagem",
-        characterManager: "Gerencie o personagem: %v",
-        setHunger: "Ajustar fome do personagem"
+        characterManager: "Gerencie o personagem: %v"
     },
     log: {
         interactionCreateEvent: "Comando: %v - Opção: %v",
