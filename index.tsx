@@ -4,7 +4,7 @@ export const index = (prop: { id: string }): TsxComplexElement => (
   <html>
   <head>
     <title>Character</title>
-    <style>{`body { margin: 0%;}`}</style>
+    <style>{'body { margin: 0% }'}</style>
     <script>{`
         setInterval(async () => {
           const response = await fetch("check?id=${prop.id}", {
@@ -21,7 +21,7 @@ export const index = (prop: { id: string }): TsxComplexElement => (
     `}</script>
   </head>
   <body>
-    <object id="pdf" data={`character?id=${prop.id}`} type="application/pdf" width="100%" height="100%"></object>
+    <object id="pdf" data={`character?id=${prop.id}`} type="application/pdf" width="100%" height="100%"/>
   </body>
   </html>
 );

@@ -1,6 +1,6 @@
 import { RollResult } from "./diceRollManager.ts";
 import { config } from "./config.ts";
-import { Embed, Message, TextChannel, User } from "./deps.ts";
+import { ButtonStyle, Embed, Message, MessageComponentType, TextChannel, User, base64 } from "./deps.ts";
 import { labels } from "./i18n/labels.ts";
 import * as characterManager from "./characterManager.ts";
 import { CommandScope, Storyteller, allScopes } from "./command.ts";
@@ -84,5 +84,14 @@ export function buildCurrentCharacterEmbed(name: string): Embed {
         description: name,
         //Cinza
         color: 9807270
-    })
+    });
+}
+
+export async function sendCharacterLink(user: User) {
+    await user.send(new Embed({
+        title: labels.openYourCharacter,
+        description: `🔗 ${config.host}/?id=${base64.encode(user.id)}`,
+        //Cinza
+        color: 9807270
+    }));
 }

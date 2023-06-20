@@ -7,7 +7,8 @@ export type ConfigDef = {
     storytellerId: string,
     dicePoolsChannelId: string,
     storytellerChannelId: string,
-    outputChannelId: string
+    outputChannelId: string,
+    host: string
 }
 
 const path = Deno.args.length > 0 ? Deno.args[0] : Deno.env.get("WODBOT_CRONICLE_PATH");

@@ -1,9 +1,7 @@
 import { LabelsType } from "./labelsType.ts";
 
 export const pt: LabelsType = {
-    urlAuth: "Entre no link para autenticar -> %v",
     authSuccess: "Autenticado com sucesso!",
-    closeThisFlap: "Ok! Pode fechar essa aba.",
     welcome: "Wodbot 5.0 entrou!",
     dices: "Dados",
     difficulty: "Dificuldade",
@@ -23,8 +21,8 @@ export const pt: LabelsType = {
     updateExperienceSuccess: "O personagem '%v' teve a experiência atualizada para: %v",
     updateHungerSuccess: "O personagem '%v' teve a fome atualizada para: %v",
     currentCharacter: "Personagem selecionado",
-    jsonResponseError: "Http Error: %v %v %v %v",
     loading: "Carregando...",
+    openYourCharacter: "Abra sua ficha clicando no link!",
     dicePools: {
         attackWithFists: {
             name: "Ataque com os Punhos",
@@ -36,7 +34,7 @@ export const pt: LabelsType = {
         reloadCharacters: "Recarregar personagens",
         addExperience: "Aumentar experiência do personagem",
         decreaseExperience: "Remover experiência do personagem",
-        changeCharacterOption: "Mudar para o personagem: %v",
+        characterManager: "Gerencie o personagem: %v",
         setHunger: "Ajustar fome do personagem"
     },
     log: {

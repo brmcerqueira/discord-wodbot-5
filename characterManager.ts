@@ -166,16 +166,21 @@ export async function updateHunger(id: string, update: (value: number) => number
     character.hunger = value;
 }
 
+export function getUserIdByCharacterId(characterId: string): string | undefined {
+  const pair = Object.entries(users).find(p => p[1] == characterId);
+  return pair?.[0];
+}
+
 async function updatePdf(id: string, update: (form: pdf.PDFForm) => void) {
     const pair = documents[id];
     const document = pair.document;
     update(document.getForm());
-    const pairUserId = Object.entries(users).find(p => p[1] == id);
-    pair.file = `${characters[id].name}${pairUserId ? `[${pairUserId[0]}]` : ""}.pdf`;
+    const userId = getUserIdByCharacterId(id);
+    pair.file = `${characters[id].name}${userId ? `[${userId}]` : ""}.pdf`;
     await Deno.writeFile(`${charactersPath}/${pair.file}`,
     await document.save({ updateFieldAppearances: false }));
-    if (pairUserId) {
-        await buildLightPdf(pairUserId[0], pair.file);
+    if (userId) {
+        await buildLightPdf(userId, pair.file);
     }
 }
 

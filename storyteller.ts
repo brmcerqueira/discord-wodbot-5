@@ -2,12 +2,12 @@ import { labels } from "./i18n/labels.ts";
 import { setDifficultyButton } from "./buttons/setDifficultyButton.ts";
 import { reloadCharactersButton } from "./buttons/reloadCharactersButton.ts";
 import * as characterManager from "./characterManager.ts";
-import { changeCharacterButton } from "./buttons/changeCharacterButton.ts";
 import { addExperienceButton } from "./buttons/addExperienceButton.ts";
 import { decreaseExperienceButton } from "./buttons/decreaseExperienceButton.ts";
 import { ButtonStyle, sprintf } from "./deps.ts";
 import { setHungerButton } from "./buttons/setHungerButton.ts";
-import { AddExperience, ChangeCharacter, Command, DecreaseExperience, ReloadCharacters, SetDifficulty, SetHunger, Storyteller, createCommandScope } from "./command.ts";
+import { AddExperience, Button, ChangeCharacter, Command, DecreaseExperience, ReloadCharacters, SetDifficulty, SetHunger, Storyteller, createCommandScope } from "./command.ts";
+import { characterButton } from "./buttons/characterButton.ts";
 
 const defaultCommands: Command[] = [
     {
@@ -287,17 +287,32 @@ export function buildCommands(): Command[] {
 
     for (const key in characterManager.characters) {
         const character = characterManager.characters[key];
-        result.push({
-            message: `__**${sprintf(labels.commands.changeCharacterOption, character.name)}**__`,
-            buttons: [{
-                style: ButtonStyle.SECONDARY,
+
+        const buttons: Button[] = [{
+            style: ButtonStyle.SECONDARY,
+            emoji: {
+                name: '🧛'
+            },
+            value: {isChange: true, id: key}
+        }]
+
+        const userId = characterManager.getUserIdByCharacterId(key);
+
+        if (userId) {
+            buttons.push({
+                style: ButtonStyle.SUCCESS,
                 emoji: {
-                    name: '🧛'
+                    name: '🔗'
                 },
-                value: key
-            }],
+                value: {isChange: false, id: userId}
+            });
+        }
+
+        result.push({
+            message: `__**${sprintf(labels.commands.characterManager, character.name)}**__`,
+            buttons: buttons,
             scopes: [Storyteller, ChangeCharacter, createCommandScope()],
-            action: changeCharacterButton
+            action: characterButton
         });
     }
 

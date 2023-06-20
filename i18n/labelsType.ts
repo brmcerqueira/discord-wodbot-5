@@ -5,7 +5,6 @@ export type DicePoolType = {
 
 export type LabelsType = {
     authSuccess: string,
-    closeThisFlap: string,
     welcome: string,
     dices: string,
     difficulty: string,
@@ -26,6 +25,7 @@ export type LabelsType = {
     updateHungerSuccess: string,
     currentCharacter: string,
     loading: string,
+    openYourCharacter: string,
     dicePools: {
         attackWithFists: DicePoolType
     },
@@ -34,7 +34,7 @@ export type LabelsType = {
         reloadCharacters: string,
         addExperience: string,
         decreaseExperience: string,
-        changeCharacterOption: string,
+        characterManager: string,
         setHunger: string
     },
     log: {

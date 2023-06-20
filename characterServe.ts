@@ -1,9 +1,13 @@
 import { charactersPath, outPath } from "./config.ts";
+import { base64 } from "./deps.ts";
 import { index } from "./index.tsx";
 
 const etags: {
     [id: string]: string
 } = {};
+
+const textEncoder = new TextEncoder();
+const textDecoder = new TextDecoder();
 
 export async function start(): Promise<void> {
     const connection = Deno.listen({ port: 3000 });
@@ -12,10 +16,8 @@ export async function start(): Promise<void> {
     for await (const event of httpServer) {
         const url = new URL(event.request.url);
    
-        const textEncoder = new TextEncoder();
-
         if (url.pathname == "/character" && url.searchParams.has("id")) {
-            const id = url.searchParams.get("id")!;
+            const id = decodeBase64(url.searchParams.get("id")!);
 
             if (etags[id] && event.request.headers.has("If-None-Match") && event.request.headers.get("If-None-Match") == etags[id]) {
                 await event.respondWith(new Response(null, {
@@ -39,7 +41,15 @@ export async function start(): Promise<void> {
             }
         }
         else if (url.pathname == "/check" && url.searchParams.has("id")) {
-            await event.respondWith(Response.json({ update: !etags[url.searchParams.get("id")!] }));
+            await event.respondWith(Response.json({ update: !etags[decodeBase64(url.searchParams.get("id")!)] }));
+        }
+        else if (url.pathname == "/template") {
+            await event.respondWith(new Response(await Deno.readFile("./pdf/template.pdf"), {
+                status: 200,
+                headers: {
+                    "Content-Type": "application/pdf"
+                }
+            }));
         }
         else if (url.searchParams.has("id")) {
             await event.respondWith(new Response(textEncoder.encode(await index({ 
@@ -64,6 +74,10 @@ export async function buildLightPdf(userId: string, file: string) {
     `${charactersPath}/${file}`] 
     }).status();
     delete etags[userId];
+}
+
+function decodeBase64(data: string): string {
+    return textDecoder.decode(base64.decode(data));
 }
 
 async function respond404(event: Deno.RequestEvent) {
