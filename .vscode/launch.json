@@ -15,6 +15,7 @@
                 "run",
                 "--inspect-wait",
                 "--allow-all",
+                "--unstable",
                 "--config",
                 "./tsconfig.json",
             ],

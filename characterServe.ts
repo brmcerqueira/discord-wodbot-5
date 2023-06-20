@@ -1,4 +1,5 @@
 import { charactersPath, outPath } from "./config.ts";
+import { index } from "./index.tsx";
 
 const etags: {
     [id: string]: string
@@ -11,43 +12,40 @@ export async function start(): Promise<void> {
     for await (const event of httpServer) {
         const url = new URL(event.request.url);
    
-        if (url.searchParams.has("id")) {
+        const textEncoder = new TextEncoder();
+
+        if (url.pathname == "/character" && url.searchParams.has("id")) {
             const id = url.searchParams.get("id")!;
-
-            let headers: HeadersInit | undefined = undefined;
-
-            if (url.searchParams.has("refresh")) {
-                headers = {
-                    Refresh: url.searchParams.get("refresh")!
-                }
-            }
 
             if (etags[id] && event.request.headers.has("If-None-Match") && event.request.headers.get("If-None-Match") == etags[id]) {
                 await event.respondWith(new Response(null, {
-                    status: 304,
-                    headers: headers
+                    status: 304
                 }));
             }
             else {
                 try {
-                    if (!headers) {
-                        headers = {};
-                    }
-
-                    headers["Content-Type"] = "application/pdf";
-                    headers.ETag = new Date().getTime().toString();
-
-                    etags[id] = headers.ETag;
+                    etags[id] = new Date().getTime().toString();
 
                     await event.respondWith(new Response(await Deno.readFile(`${outPath}/${id}.pdf`), {
                         status: 200,
-                        headers: headers
+                        headers: {
+                            "Content-Type": "application/pdf",
+                            ETag: etags[id]
+                        }
                     }));
                 } catch (_error) {
                     await respond404(event);
                 }
             }
         }
+        else if (url.pathname == "/check" && url.searchParams.has("id")) {
+            await event.respondWith(Response.json({ update: !etags[url.searchParams.get("id")!] }));
+        }
+        else if (url.searchParams.has("id")) {
+            await event.respondWith(new Response(textEncoder.encode(await index({ 
+                id: url.searchParams.get("id")!
+            }).render())));
+        }  
         else {
             await respond404(event);
         }
