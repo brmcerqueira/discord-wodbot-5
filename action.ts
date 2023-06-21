@@ -9,10 +9,8 @@ export type Button = {
   emoji?: MessageComponentEmoji;
 };
 
-export type ActionCallBack = (interaction: Interaction, value: any, scopes?: Scope[]) => Promise<void>;
-
 export interface Action {
-  action: ActionCallBack;
+  solve: (interaction: Interaction, value: any, scopes?: Scope[]) => Promise<void>;
   message?: string | Embed;
   buttons?: Button[];
   scopes?: Scope[];

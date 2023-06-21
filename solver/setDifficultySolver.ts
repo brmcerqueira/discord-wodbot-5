@@ -2,15 +2,15 @@ import * as botData from "../botData.ts";
 import { Embed, Interaction } from "../deps.ts";
 import { labels } from "../i18n/labels.ts";
 
-export async function setModifierButton(_interaction: Interaction, modifier: number) {
-    botData.setModifier(modifier);  
+export async function setDifficultySolver(_interaction: Interaction, difficulty: number) {
+    botData.setDifficulty(difficulty);  
     await botData.outputChannel.send(new Embed({
-        title: labels.storytellerChangeModifier,
+        title: labels.storytellerChangeDifficulty,
         //Cinza
         color: 9807270,
         fields: [{
-            name: labels.modifier,
-            value: `**${botData.modifier}**`,
+            name: labels.difficulty,
+            value: `**${botData.difficulty}**`,
             inline: true
         }]
     }));

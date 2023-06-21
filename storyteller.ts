@@ -1,12 +1,12 @@
 import { labels } from "./i18n/labels.ts";
-import { setDifficultyButton } from "./buttons/setDifficultyButton.ts";
-import { reloadCharactersButton } from "./buttons/reloadCharactersButton.ts";
 import * as characterManager from "./characterManager.ts";
 import { ButtonStyle, sprintf } from "./deps.ts";
-import { characterButton } from "./buttons/characterButton.ts";
-import { setModifierButton } from "./buttons/setModifierButton.ts";
 import { Action, Button } from "./action.ts";
 import { ChangeCharacter, ReloadCharacters, SetBonus, SetDifficulty, SetOnus, Storyteller, createScope } from "./scope.ts";
+import { reloadCharactersSolver } from "./solver/reloadCharactersSolver.ts";
+import { setDifficultySolver } from "./solver/setDifficultySolver.ts";
+import { setModifierSolver } from "./solver/setModifierSolver.ts";
+import { characterSolver } from "./solver/characterSolver.ts";
 
 const defaultActions: Action[] = [
     {
@@ -18,7 +18,7 @@ const defaultActions: Action[] = [
             }
         }],
         scopes: [Storyteller, ReloadCharacters],
-        action: reloadCharactersButton
+        solve: reloadCharactersSolver
     },
     {
         message: `__**${labels.actions.setDifficulty}**__`,
@@ -87,7 +87,7 @@ const defaultActions: Action[] = [
                 value: 9
             }],
         scopes: [Storyteller, SetDifficulty],
-        action: setDifficultyButton
+        solve: setDifficultySolver
     },
     {
         message: `__**${labels.actions.setBonus}**__`,
@@ -156,7 +156,7 @@ const defaultActions: Action[] = [
                 value: 9
             }],
         scopes: [Storyteller, SetBonus],
-        action: setModifierButton
+        solve: setModifierSolver
     },
     {
         message: `__**${labels.actions.setOnus}**__`,
@@ -225,7 +225,7 @@ const defaultActions: Action[] = [
                 value: -9
             }],
         scopes: [Storyteller, SetOnus],
-        action: setModifierButton
+        solve: setModifierSolver
     }
 ];
 
@@ -259,7 +259,7 @@ export function buildActions(): Action[] {
             message: `__**${sprintf(labels.actions.characterManager, character.name)}**__`,
             buttons: buttons,
             scopes: [Storyteller, ChangeCharacter, createScope()],
-            action: characterButton
+            solve: characterSolver
         });
     }
 

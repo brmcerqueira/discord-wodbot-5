@@ -1,7 +1,6 @@
 import { ApplicationCommandPayload, Client, GatewayIntents, Interaction, InteractionMessageComponentData, InteractionResponseType, InteractionType, InteractionApplicationCommandData, MessageComponentData, MessageComponentType, TextChannel } from "./deps.ts";
 import { labels } from "./i18n/labels.ts";
 import { config } from "./config.ts";
-import { reRollButton } from "./buttons/reRollButton.ts";
 import { logger } from "./logger.ts";
 import * as dicePools from "./dicePools.ts";
 import * as characterServe from "./characterServe.ts";
@@ -11,6 +10,7 @@ import * as storyteller from "./storyteller.ts";
 import { sendRoll } from "./utils/sendRoll.ts";
 import { Action } from "./action.ts";
 import { ReRoll, buildId, checkScope, parseCustomId } from "./scope.ts";
+import { reRollSolver } from "./solver/reRollSolver.ts";
 
 characterServe.start();
 await characterManager.load();
@@ -20,7 +20,7 @@ const storytellerActions = storyteller.buildActions();
 
 const actions: Action[] = [{
   scopes: [ReRoll],
-  action: reRollButton
+  solve: reRollSolver
 }];
 
 const client = new Client({
@@ -142,11 +142,11 @@ client.on('interactionCreate', async (interaction: Interaction) => {
     const data = <InteractionMessageComponentData>interaction.data;
     const customId = parseCustomId(data.custom_id);
     logger.debug(labels.log.interactionCreateEvent, interaction.message?.content, customId.index);
-    for (const command of actions) {
-      if (command.scopes == undefined || checkScope(interaction.user, customId, command.scopes)) {
-        await command.action(interaction,
-          command.buttons ? command.buttons[customId.index].value : customId,
-          command.scopes);
+    for (const action of actions) {
+      if (action.scopes == undefined || checkScope(interaction.user, customId, action.scopes)) {
+        await action.solve(interaction,
+          action.buttons ? action.buttons[customId.index].value : customId,
+          action.scopes);
         if (!interaction.responded) {
           await interaction.respond({
             type: InteractionResponseType.UPDATE_MESSAGE,

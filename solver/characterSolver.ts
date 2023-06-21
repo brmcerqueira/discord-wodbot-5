@@ -3,7 +3,7 @@ import { config } from "../config.ts";
 import { Embed, Interaction, base64 } from "../deps.ts";
 import { labels } from "../i18n/labels.ts";
 
-export async function characterButton(interaction: Interaction, value: {
+export async function characterSolver(interaction: Interaction, value: {
     isChange: boolean,
     id: string,
 }) {

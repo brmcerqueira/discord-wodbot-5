@@ -1,9 +1,9 @@
 import { Action } from "./action.ts";
-import { dicePoolButton } from "./buttons/dicePoolButton.ts";
 import { Character } from "./character.ts"
 import { ButtonStyle } from "./deps.ts";
 import { labels } from "./i18n/labels.ts"
 import { DicePool, createScope } from "./scope.ts";
+import { dicePoolSolver } from "./solver/dicePoolSolver.ts";
 
 export type DicePoolResult = {
     dices: number, 
@@ -13,7 +13,7 @@ export type DicePoolResult = {
 export type DicePool = {
     name: string,
     description: string,
-    action: (character: Character) => DicePoolResult
+    build: (character: Character) => DicePoolResult
 }
 
 export type DicePools = {
@@ -32,7 +32,7 @@ export function buildActions(): Action[] {
               value: dicePool
           }],
           scopes: [DicePool, createScope()],
-          action: dicePoolButton
+          solve: dicePoolSolver
         };
       })
 }
@@ -41,7 +41,7 @@ const dicePools: DicePool[] = [
     {
         name: labels.dicePools.attackWithFists.name,
         description: labels.dicePools.attackWithFists.description,
-        action: c => {
+        build: c => {
             return {
                 dices: c.attributes.physical.strength + c.skills.physical.brawl,
                 difficulty: 1
