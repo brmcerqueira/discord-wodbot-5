@@ -19,7 +19,9 @@ export const pt: LabelsType = {
     storytellerChangeDifficulty: "O narrador mudou a dificuldade.",
     storytellerChangeModifier: "O narrador mudou o modificador.",
     changeCharacterSuccess: "Novo personagem selecionado: %v",
-    loadCharacterSuccess: "Personagem atualizado: %v",
+    loadCharacterSuccess: "Personagem carregado: %v",
+    loadCharacterError: "Erro ao carregar o personagem: %v", 
+    uploadCharacterSuccess: "O personagem foi enviado com sucesso", 
     currentCharacter: "Personagem selecionado",
     loading: "Carregando...",
     openYourCharacter: "Abra sua ficha clicando no link!",
@@ -35,10 +37,6 @@ export const pt: LabelsType = {
         setOnus: "Inserir uma penalidade",
         reloadCharacters: "Recarregar personagens",
         characterManager: "Gerencie o personagem: %v"
-    },
-    log: {
-        interactionCreateEvent: "Comando: %v - Opção: %v",
-        messageCreateEvent: "Messagem: %v"
     },
     commands: {
         roll: {
@@ -60,6 +58,14 @@ export const pt: LabelsType = {
                 name: "descrição",
                 description: "Descrição da jogada"
             }   
+        },
+        uploadCharacter: {
+            name: "enviar",
+            description: "Envie sua ficha para o narrador",
+            file: {
+                name: "ficha",
+                description: "Ficha a ser enviada"
+            }
         }
     }
 };

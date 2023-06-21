@@ -1,4 +1,4 @@
-import { ApplicationCommandPayload, Client, GatewayIntents, Interaction, InteractionMessageComponentData, InteractionResponseType, InteractionType, InteractionApplicationCommandData, MessageComponentData, MessageComponentType, TextChannel } from "./deps.ts";
+import { ApplicationCommandPayload, Client, GatewayIntents, Interaction, InteractionMessageComponentData, InteractionResponseType, InteractionType, InteractionApplicationCommandData, MessageComponentData, MessageComponentType, TextChannel, Embed } from "./deps.ts";
 import { labels } from "./i18n/labels.ts";
 import { config } from "./config.ts";
 import { logger } from "./logger.ts";
@@ -22,6 +22,16 @@ const actions: Action[] = [{
   scopes: [ReRoll],
   solve: reRollSolver
 }];
+
+type Attachment = {
+  url: string,
+  size: number,
+  proxy_url: string,
+  id: string,
+  filename: string,
+  ephemeral: boolean,
+  content_type: string
+}
 
 const client = new Client({
   token: config.discordToken,
@@ -91,8 +101,10 @@ async function buildChannelActions(channelId: string, channelActions: Action[], 
 
 client.on('ready', async () => {
   logger.info(labels.loading);
-  if (!(<ApplicationCommandPayload[]><unknown>await
-    client.rest.endpoints.getGlobalApplicationCommands(client.applicationID!)).find(c => c.name == labels.commands.roll.name)) {
+
+  const commands = <ApplicationCommandPayload[]><unknown> await client.rest.endpoints.getGlobalApplicationCommands(client.applicationID!);
+
+  if (!commands.find(c => c.name == labels.commands.roll.name)) {
     await client.rest.endpoints.createGlobalApplicationCommand(client.applicationID!, {
       type: 1,
       name: labels.commands.roll.name,
@@ -127,6 +139,21 @@ client.on('ready', async () => {
     });
   }
 
+  if (!commands.find(c => c.name == labels.commands.uploadCharacter.name)) {
+    await client.rest.endpoints.createGlobalApplicationCommand(client.applicationID!, {
+      type: 1,
+      name: labels.commands.uploadCharacter.name,
+      description: labels.commands.uploadCharacter.description,
+      dm_permission: true,
+      options: [{
+        name: labels.commands.uploadCharacter.file.name,
+        description: labels.commands.uploadCharacter.file.description,
+        type: 11,
+        required: true
+      }]
+    });
+  }
+
   await client.users.fetch(config.storytellerId);
   for (const id of Object.keys(characterManager.users)) {
     await client.users.fetch(id);
@@ -141,7 +168,6 @@ client.on('interactionCreate', async (interaction: Interaction) => {
   if (!interaction.user.bot && interaction.type == InteractionType.MESSAGE_COMPONENT) {
     const data = <InteractionMessageComponentData>interaction.data;
     const customId = parseCustomId(data.custom_id);
-    logger.debug(labels.log.interactionCreateEvent, interaction.message?.content, customId.index);
     for (const action of actions) {
       if (action.scopes == undefined || checkScope(interaction.user, customId, action.scopes)) {
         await action.solve(interaction,
@@ -189,6 +215,20 @@ client.on('interactionCreate', async (interaction: Interaction) => {
           components: m.components
         });
       }, interaction.user.id, dices, hunger, difficulty, description);
+    }
+    else if(data.name == labels.commands.uploadCharacter.name) {
+      const attachment: Attachment = (<any>data.resolved)["attachments"][data.options[0].value];
+      if (attachment.content_type == "application/pdf") {
+        await characterManager.saveCharacter(attachment.url, interaction.user);
+        await interaction.respond({
+          type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+          embeds: [new Embed({
+            title: labels.uploadCharacterSuccess,
+            //Verde
+            color: 3066993
+          })]
+        });
+      }
     }
   }
 });

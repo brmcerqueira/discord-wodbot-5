@@ -23,6 +23,8 @@ export type LabelsType = {
     storytellerChangeModifier: string,
     changeCharacterSuccess: string,
     loadCharacterSuccess: string,
+    loadCharacterError: string,
+    uploadCharacterSuccess: string,
     currentCharacter: string,
     loading: string,
     openYourCharacter: string,
@@ -35,10 +37,6 @@ export type LabelsType = {
         setOnus: string,
         reloadCharacters: string,
         characterManager: string,
-    },
-    log: {
-        interactionCreateEvent: string,
-        messageCreateEvent: string
     },
     commands: {
         roll: {
@@ -60,6 +58,14 @@ export type LabelsType = {
                 name: string,
                 description: string
             }   
+        },
+        uploadCharacter: {
+            name: string,
+            description: string,
+            file: {
+                name: string,
+                description: string
+            }
         }
     }
 }
