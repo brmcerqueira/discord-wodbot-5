@@ -3,11 +3,12 @@ import { setDifficultyButton } from "./buttons/setDifficultyButton.ts";
 import { reloadCharactersButton } from "./buttons/reloadCharactersButton.ts";
 import * as characterManager from "./characterManager.ts";
 import { ButtonStyle, sprintf } from "./deps.ts";
-import { Button, ChangeCharacter, Command, ReloadCharacters, SetBonus, SetDifficulty, SetOnus, Storyteller, createCommandScope } from "./command.ts";
 import { characterButton } from "./buttons/characterButton.ts";
 import { setModifierButton } from "./buttons/setModifierButton.ts";
+import { Action, Button } from "./action.ts";
+import { ChangeCharacter, ReloadCharacters, SetBonus, SetDifficulty, SetOnus, Storyteller, createScope } from "./scope.ts";
 
-const defaultCommands: Command[] = [
+const defaultActions: Action[] = [
     {
         message: `__**${labels.actions.reloadCharacters}**__`,
         buttons: [{
@@ -228,12 +229,8 @@ const defaultCommands: Command[] = [
     }
 ];
 
-export function buildCommands(): Command[] {
-    const result: Command[] = [];
-
-    for (const command of defaultCommands) {
-        result.push(command);
-    }
+export function buildActions(): Action[] {
+    const result: Action[] = [...defaultActions];
 
     for (const key in characterManager.characters) {
         const character = characterManager.characters[key];
@@ -261,7 +258,7 @@ export function buildCommands(): Command[] {
         result.push({
             message: `__**${sprintf(labels.actions.characterManager, character.name)}**__`,
             buttons: buttons,
-            scopes: [Storyteller, ChangeCharacter, createCommandScope()],
+            scopes: [Storyteller, ChangeCharacter, createScope()],
             action: characterButton
         });
     }

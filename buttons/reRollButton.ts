@@ -3,7 +3,7 @@ import { labels } from "../i18n/labels.ts";
 import * as botData from "../botData.ts";
 import { Interaction, InteractionResponseType, sprintf } from "../deps.ts";
 import { rollEmbed } from "../utils/rollEmbed.ts";
-import { CustomId } from "../botData.ts";
+import { CustomId } from "../scope.ts";
 
 export async function reRollButton(interaction: Interaction, customId: CustomId) {
     const roll = botData.lastRolls[interaction.user.id];

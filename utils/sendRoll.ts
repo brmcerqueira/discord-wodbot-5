@@ -2,7 +2,7 @@ import { roll } from "../diceRollManager.ts";
 import * as botData from "../botData.ts";
 import { ButtonStyle, Embed, EmbedPayload, MessageComponentData, MessageComponentType } from "../deps.ts";
 import { rollEmbed } from "./rollEmbed.ts";
-import { ReRoll } from "../command.ts";
+import { ReRoll, buildId } from "../scope.ts";
 
 export type SendRollData = {
     embeds?: Array<Embed | EmbedPayload>
@@ -50,7 +50,7 @@ export async function sendRoll(send: (data: SendRollData) => Promise<void>,
                 name: '1️⃣'
             },
             style: ButtonStyle.SECONDARY,
-            customID: botData.buildId(1, ...scopes)
+            customID: buildId(1, ...scopes)
         }];
 
         options.components = [{
@@ -66,7 +66,7 @@ export async function sendRoll(send: (data: SendRollData) => Promise<void>,
                     name: '2️⃣'
                 },
                 style: ButtonStyle.SECONDARY,
-                customID: botData.buildId(2, ...scopes)
+                customID: buildId(2, ...scopes)
             });
         }
 
@@ -78,7 +78,7 @@ export async function sendRoll(send: (data: SendRollData) => Promise<void>,
                     name: '3️⃣'
                 },
                 style: ButtonStyle.SECONDARY,
-                customID: botData.buildId(3, ...scopes)
+                customID: buildId(3, ...scopes)
             })
         }
     }

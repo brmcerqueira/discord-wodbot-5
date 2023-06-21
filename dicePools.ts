@@ -1,8 +1,9 @@
+import { Action } from "./action.ts";
 import { dicePoolButton } from "./buttons/dicePoolButton.ts";
 import { Character } from "./character.ts"
-import { Command, DicePool, createCommandScope } from "./command.ts";
 import { ButtonStyle } from "./deps.ts";
 import { labels } from "./i18n/labels.ts"
+import { DicePool, createScope } from "./scope.ts";
 
 export type DicePoolResult = {
     dices: number, 
@@ -19,7 +20,7 @@ export type DicePools = {
     [emoji: string]: DicePool
 }
 
-export function buildCommands(): Command[] {
+export function buildActions(): Action[] {
     return dicePools.map(dicePool => {
         return {
           message: `__**${dicePool.name}**__`,
@@ -30,7 +31,7 @@ export function buildCommands(): Command[] {
               },
               value: dicePool
           }],
-          scopes: [DicePool, createCommandScope()],
+          scopes: [DicePool, createScope()],
           action: dicePoolButton
         };
       })

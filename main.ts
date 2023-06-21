@@ -8,16 +8,17 @@ import * as characterServe from "./characterServe.ts";
 import * as botData from "./botData.ts";
 import * as characterManager from "./characterManager.ts";
 import * as storyteller from "./storyteller.ts";
-import { Command, ReRoll } from "./command.ts";
 import { sendRoll } from "./utils/sendRoll.ts";
+import { Action } from "./action.ts";
+import { ReRoll, buildId, checkScope, parseCustomId } from "./scope.ts";
 
 characterServe.start();
 await characterManager.load();
 characterManager.watch();
 
-const storytellerCommands = storyteller.buildCommands();
+const storytellerActions = storyteller.buildActions();
 
-const commands: Command[] = [{
+const actions: Action[] = [{
   scopes: [ReRoll],
   action: reRollButton
 }];
@@ -35,7 +36,7 @@ const client = new Client({
   ]
 });
 
-async function buildChannelCommands(channelId: string, channelCommands: Command[], beforeMessages?: (c: TextChannel) => Promise<void>) {
+async function buildChannelActions(channelId: string, channelActions: Action[], beforeMessages?: (c: TextChannel) => Promise<void>) {
   const channel: TextChannel = await client.channels.fetch(channelId);
 
   const allMessages = await channel.fetchMessages();
@@ -55,23 +56,23 @@ async function buildChannelCommands(channelId: string, channelCommands: Command[
     await beforeMessages(channel);
   }
 
-  for (const command of channelCommands) {
+  for (const action of channelActions) {
     let buttons: MessageComponentData[] = [];
 
     const actionRows: MessageComponentData[] = [];
 
-    for (let index = 0; index < command.buttons!.length; index++) {
-      const button = command.buttons![index];
+    for (let index = 0; index < action.buttons!.length; index++) {
+      const button = action.buttons![index];
 
       buttons.push({
         type: MessageComponentType.Button,
         label: button.label || '',
         emoji: button.emoji,
         style: button.style,
-        customID: botData.buildId(index, ...(command.scopes || []))
+        customID: buildId(index, ...(action.scopes || []))
       });
 
-      if (buttons.length >= 5 || index == (command.buttons!.length - 1)) {
+      if (buttons.length >= 5 || index == (action.buttons!.length - 1)) {
         actionRows.push({
           type: MessageComponentType.ActionRow,
           components: buttons
@@ -80,11 +81,11 @@ async function buildChannelCommands(channelId: string, channelCommands: Command[
       }
     }
 
-    await channel.send(command.message, {
+    await channel.send(action.message, {
       components: actionRows
     });
 
-    commands.push(command);
+    actions.push(action);
   }
 }
 
@@ -131,18 +132,18 @@ client.on('ready', async () => {
     await client.users.fetch(id);
   }
   botData.setOutputChannel((await client.channels.fetch(config.outputChannelId))!);
-  await buildChannelCommands(config.dicePoolsChannelId, dicePools.buildCommands());
-  await buildChannelCommands(config.storytellerChannelId, storytellerCommands, async c => await botData.buildCurrentCharacterMessage(c));
+  await buildChannelActions(config.dicePoolsChannelId, dicePools.buildActions());
+  await buildChannelActions(config.storytellerChannelId, storytellerActions, async c => await botData.buildCurrentCharacterMessage(c));
   logger.info(labels.welcome);
 });
 
 client.on('interactionCreate', async (interaction: Interaction) => {
   if (!interaction.user.bot && interaction.type == InteractionType.MESSAGE_COMPONENT) {
     const data = <InteractionMessageComponentData>interaction.data;
-    const customId = botData.parseCustomId(data.custom_id);
+    const customId = parseCustomId(data.custom_id);
     logger.debug(labels.log.interactionCreateEvent, interaction.message?.content, customId.index);
-    for (const command of commands) {
-      if (command.scopes == undefined || botData.checkMessageScope(interaction.user, customId, command.scopes)) {
+    for (const command of actions) {
+      if (command.scopes == undefined || checkScope(interaction.user, customId, command.scopes)) {
         await command.action(interaction,
           command.buttons ? command.buttons[customId.index].value : customId,
           command.scopes);
