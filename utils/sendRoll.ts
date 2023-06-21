@@ -1,10 +1,15 @@
 import { roll } from "../diceRollManager.ts";
 import * as botData from "../botData.ts";
-import { AllMessageOptions, ButtonStyle, MessageComponentData, MessageComponentType, TextChannel } from "../deps.ts";
+import { ButtonStyle, Embed, EmbedPayload, MessageComponentData, MessageComponentType } from "../deps.ts";
 import { rollEmbed } from "./rollEmbed.ts";
 import { ReRoll } from "../command.ts";
 
-export async function rollHelper(channel: TextChannel,
+export type SendRollData = {
+    embeds?: Array<Embed | EmbedPayload>
+    components?: MessageComponentData[]
+}
+
+export async function sendRoll(send: (data: SendRollData) => Promise<void>,
     authorId: string,
     dices: number,
     hunger: number,
@@ -31,7 +36,7 @@ export async function rollHelper(channel: TextChannel,
 
     const embed = rollEmbed(result, authorId, description);
 
-    const options: AllMessageOptions = {
+    const options: SendRollData = {
         embeds: [embed]
     };
 
@@ -78,7 +83,7 @@ export async function rollHelper(channel: TextChannel,
         }
     }
 
-    await channel.send(options);
+    await send(options);
 
     botData.lastRolls[authorId.toString()] = {
         embed: embed,

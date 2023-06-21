@@ -9,7 +9,7 @@ import { setModifierButton } from "./buttons/setModifierButton.ts";
 
 const defaultCommands: Command[] = [
     {
-        message: `__**${labels.commands.reloadCharacters}**__`,
+        message: `__**${labels.actions.reloadCharacters}**__`,
         buttons: [{
             style: ButtonStyle.SECONDARY,
             emoji: {
@@ -20,7 +20,7 @@ const defaultCommands: Command[] = [
         action: reloadCharactersButton
     },
     {
-        message: `__**${labels.commands.setDifficulty}**__`,
+        message: `__**${labels.actions.setDifficulty}**__`,
         buttons: [
             {
                 style: ButtonStyle.SECONDARY,
@@ -89,7 +89,7 @@ const defaultCommands: Command[] = [
         action: setDifficultyButton
     },
     {
-        message: `__**${labels.commands.setBonus}**__`,
+        message: `__**${labels.actions.setBonus}**__`,
         buttons: [
             {
                 style: ButtonStyle.SECONDARY,
@@ -158,7 +158,7 @@ const defaultCommands: Command[] = [
         action: setModifierButton
     },
     {
-        message: `__**${labels.commands.setOnus}**__`,
+        message: `__**${labels.actions.setOnus}**__`,
         buttons: [
             {
                 style: ButtonStyle.SECONDARY,
@@ -259,7 +259,7 @@ export function buildCommands(): Command[] {
         }
 
         result.push({
-            message: `__**${sprintf(labels.commands.characterManager, character.name)}**__`,
+            message: `__**${sprintf(labels.actions.characterManager, character.name)}**__`,
             buttons: buttons,
             scopes: [Storyteller, ChangeCharacter, createCommandScope()],
             action: characterButton

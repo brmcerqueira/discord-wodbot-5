@@ -29,7 +29,7 @@ export type LabelsType = {
     dicePools: {
         attackWithFists: DicePoolType
     },
-    commands: {
+    actions: {
         setDifficulty: string,
         setBonus: string,
         setOnus: string,
@@ -39,5 +39,27 @@ export type LabelsType = {
     log: {
         interactionCreateEvent: string,
         messageCreateEvent: string
+    },
+    commands: {
+        roll: {
+            name: string,
+            description: string,
+            dices: {
+                name: string,
+                description: string
+            },
+            hunger: {
+                name: string,
+                description: string
+            },
+            difficulty: {
+                name: string,
+                description: string
+            },
+            descriptionField: {
+                name: string,
+                description: string
+            }   
+        }
     }
 }

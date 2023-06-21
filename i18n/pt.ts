@@ -29,7 +29,7 @@ export const pt: LabelsType = {
             description: "Ataque com os Punhos [Força + Briga]"
         }
     },
-    commands: {
+    actions: {
         setDifficulty: "Alterar dificuldade",
         setBonus: "Inserir uma bonificação",
         setOnus: "Inserir uma penalidade",
@@ -39,5 +39,27 @@ export const pt: LabelsType = {
     log: {
         interactionCreateEvent: "Comando: %v - Opção: %v",
         messageCreateEvent: "Messagem: %v"
+    },
+    commands: {
+        roll: {
+            name: "jogar",
+            description: "Jogue dados de dez faces",
+            dices: {
+                name: "dados",
+                description: "Quantidade de dados"
+            },
+            hunger: {
+                name: "fome",
+                description: "Quantidade de fome do vampiro"
+            },
+            difficulty: {
+                name: "dificuldade",
+                description: "Dificuldade da jogada"
+            },
+            descriptionField: {
+                name: "descrição",
+                description: "Descrição da jogada"
+            }   
+        }
     }
 };
