@@ -20,7 +20,7 @@ export const pt: LabelsType = {
     storytellerChangeModifier: "O narrador mudou o modificador.",
     changeCharacterSuccess: "Novo personagem selecionado: %v",
     loadCharacterSuccess: "Personagem carregado: %v",
-    loadCharacterError: "Erro ao carregar o personagem: %v", 
+    loadCharacterError: "Erro ao carregar o arquivo: %v -> %v", 
     uploadCharacterSuccess: "O personagem foi enviado com sucesso", 
     uploadCharacterError: "O personagem nao pode ser enviado, fale com o seu narrador.",
     currentCharacter: "Personagem selecionado",

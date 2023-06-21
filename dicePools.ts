@@ -6,7 +6,8 @@ import { DicePool, createScope } from "./scope.ts";
 import { dicePoolSolver } from "./solver/dicePoolSolver.ts";
 
 export type DicePoolResult = {
-    dices: number, 
+    dices: number,
+    modifier: number, 
     difficulty: number
 }
 
@@ -44,6 +45,7 @@ const dicePools: DicePool[] = [
         build: c => {
             return {
                 dices: c.attributes.physical.strength + c.skills.physical.brawl,
+                modifier: -c.health.penalty,
                 difficulty: 1
             };
         }

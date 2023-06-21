@@ -214,7 +214,7 @@ client.on('interactionCreate', async (interaction: Interaction) => {
           embeds: m.embeds,
           components: m.components
         });
-      }, interaction.user.id, dices, hunger, difficulty, description);
+      }, interaction.user.id, dices, hunger, difficulty, 0, description);
     }
     else if(data.name == labels.commands.uploadCharacter.name) {
       const attachment: Attachment = (<any>data.resolved)["attachments"][data.options[0].value];

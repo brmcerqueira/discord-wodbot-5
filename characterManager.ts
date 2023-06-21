@@ -39,6 +39,19 @@ export async function watch(): Promise<void> {
   }
 }
 
+export async function saveCharacter(url: string, user: User) {
+  const response = await fetch(url);
+
+  if (response.ok) {
+    await Deno.writeFile(`${charactersPath}/${user.username}[${user.id}].pdf`, response.body!);
+  }
+}
+
+export function getUserIdByCharacterId(characterId: string): string | undefined {
+  const pair = Object.entries(users).find(p => p[1] == characterId);
+  return pair?.[0];
+}
+
 async function loadCharacter(file: string, id: string) {
   try {
     const dateTime = new Date();
@@ -48,6 +61,15 @@ async function loadCharacter(file: string, id: string) {
     const document = await pdf.PDFDocument.load(arrayBuffer);
 
     const form = document.getForm();
+
+    const stamina = extract(form, "stamina", 1, 5);
+    const composure = extract(form, "composure", 1, 5);
+    const resolve = extract(form, "resolve", 1, 5);
+
+    const healthSuperficial = extract(form, "health_superficial", 1, 10);
+    const healthAggravated = extract(form, "health_aggravated", 1, 10);
+    const willpowerSuperficial = extract(form, "willpower_superficial", 1, 10);
+    const willpowerAggravated = extract(form, "willpower_aggravated", 1, 10);
 
     const bloodPotencyHigh = extract(form, "bloodPotency", 1, 5, ".high");
 
@@ -59,17 +81,17 @@ async function loadCharacter(file: string, id: string) {
         physical: {
           strength: extract(form, "strength", 1, 5),
           dexterity: extract(form, "dexterity", 1, 5),
-          stamina: extract(form, "stamina", 1, 5)
+          stamina: stamina
         },
         social: {
           charisma: extract(form, "charisma", 1, 5),
           manipulation: extract(form, "manipulation", 1, 5),
-          composure: extract(form, "composure", 1, 5)
+          composure: composure
         },
         mental: {
           intelligence: extract(form, "intelligence", 1, 5),
           wits: extract(form, "wits", 1, 5),
-          resolve: extract(form, "resolve", 1, 5)
+          resolve: resolve
         }
       },
       skills: {
@@ -108,14 +130,14 @@ async function loadCharacter(file: string, id: string) {
         }
       },
       health: {
-        superficial: extract(form, "health_superficial", 1, 10),
-        aggravated: extract(form, "health_aggravated", 1, 10),
-        penalty: 0
+        superficial: healthSuperficial,
+        aggravated: healthAggravated,
+        penalty: penalty((stamina + 3) - (healthSuperficial + healthAggravated))
       },
       willpower: {
-        superficial: extract(form, "willpower_superficial", 1, 10),
-        aggravated: extract(form, "willpower_aggravated", 1, 10),
-        penalty: 0
+        superficial: willpowerSuperficial,
+        aggravated: willpowerAggravated,
+        penalty: penalty((composure + resolve) - (willpowerSuperficial + willpowerAggravated))
       },
       humanity: {
         total: extract(form, "humanity_total", 1, 10),
@@ -144,13 +166,8 @@ async function loadCharacter(file: string, id: string) {
     logger.info(labels.loadCharacterSuccess, character.name);
   } 
   catch (error) {
-    logger.error(labels.loadCharacterError, JSON.stringify(error));
+    logger.error(labels.loadCharacterError, file, JSON.stringify(error));
   }
-}
-
-export function getUserIdByCharacterId(characterId: string): string | undefined {
-  const pair = Object.entries(users).find(p => p[1] == characterId);
-  return pair?.[0];
 }
 
 function extract(form: pdf.PDFForm, prefix: string, min: number, max: number, suffix?: string): number {
@@ -179,10 +196,6 @@ function extractDropdownSelected(form: pdf.PDFForm, name: string, parseResult?: 
   return parseResult ? parseResult(result) : result;
 }
 
-export async function saveCharacter(url: string, user: User) {
-  const response = await fetch(url);
-
-  if (response.ok) {
-    await Deno.writeFile(`${charactersPath}/${user.username}[${user.id}].pdf`, response.body!);
-  }
+function penalty(left: number): number {
+  return left <= 0 ? 3 : (left >= 1 && left <= 3 ? (3 - left) : 0);       
 }

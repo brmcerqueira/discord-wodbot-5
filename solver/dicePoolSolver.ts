@@ -14,6 +14,7 @@ export async function dicePoolSolver(interaction: Interaction, dicePool: DicePoo
         const result = dicePool.build(character);
         await sendRoll(async m => {
             await botData.outputChannel.send(m);
-        }, interaction.user.id, result.dices, character.hunger, result.difficulty, dicePool.description);
+        }, interaction.user.id, result.dices, character.hunger, 
+        result.difficulty, result.modifier, dicePool.description);
     }
 }

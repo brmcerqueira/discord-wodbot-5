@@ -14,6 +14,7 @@ export async function sendRoll(send: (data: SendRollData) => Promise<void>,
     dices: number,
     hunger: number,
     difficulty: number,
+    modifier: number,
     description: string | undefined): Promise<void> {
 
     if (botData.difficulty) {
@@ -21,10 +22,8 @@ export async function sendRoll(send: (data: SendRollData) => Promise<void>,
         botData.setDifficulty(null);
     }
 
-    let modifier = 0;
-
     if (botData.modifier) {
-        modifier = botData.modifier;
+        modifier += botData.modifier;
         botData.setModifier(null);
     }
 
