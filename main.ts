@@ -1,4 +1,4 @@
-import { ApplicationCommandPayload, Client, GatewayIntents, Interaction, InteractionMessageComponentData, InteractionResponseType, InteractionType, InteractionApplicationCommandData, MessageComponentData, MessageComponentType, TextChannel, Embed } from "./deps.ts";
+import { ApplicationCommandPayload, Client, GatewayIntents, Interaction, InteractionMessageComponentData, InteractionResponseType, InteractionType, InteractionApplicationCommandData, MessageComponentData, MessageComponentType, TextChannel, Embed, EmbedPayload } from "./deps.ts";
 import { labels } from "./i18n/labels.ts";
 import { config } from "./config.ts";
 import { logger } from "./logger.ts";
@@ -218,17 +218,32 @@ client.on('interactionCreate', async (interaction: Interaction) => {
     }
     else if(data.name == labels.commands.uploadCharacter.name) {
       const attachment: Attachment = (<any>data.resolved)["attachments"][data.options[0].value];
-      if (attachment.content_type == "application/pdf") {
+
+      const embeds: EmbedPayload[] = [];
+
+      if (attachment.content_type == "application/pdf" && botData.unlock.indexOf(interaction.user.id) > -1) {
         await characterManager.saveCharacter(attachment.url, interaction.user);
-        await interaction.respond({
-          type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-          embeds: [new Embed({
-            title: labels.uploadCharacterSuccess,
-            //Verde
-            color: 3066993
-          })]
+        
+        botData.unlock.splice(botData.unlock.indexOf(interaction.user.id), 1);
+
+        embeds.push({
+          title: labels.uploadCharacterSuccess,
+          //Verde
+          color: 3066993
         });
       }
+      else {
+        embeds.push({
+          title: labels.uploadCharacterError,
+          //Vermelho
+          color: 15158332
+        });
+      }
+
+      await interaction.respond({
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        embeds: embeds
+      });
     }
   }
 });

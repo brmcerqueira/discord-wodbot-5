@@ -1,7 +1,7 @@
 import { reRoll } from "../diceRollManager.ts";
 import { labels } from "../i18n/labels.ts";
 import * as botData from "../botData.ts";
-import { Interaction, InteractionResponseType, sprintf } from "../deps.ts";
+import { Embed, Interaction, InteractionResponseType, sprintf } from "../deps.ts";
 import { rollEmbed } from "../utils/rollEmbed.ts";
 import { CustomId } from "../scope.ts";
 
@@ -15,8 +15,8 @@ export async function reRollSolver(interaction: Interaction, customId: CustomId)
                 embeds: [roll.embed],
                 components: []
             });
-            await interaction.message!.channel.send(rollEmbed(reRoll(roll.result, customId.index), 
-            interaction.user.id, sprintf(labels.reRollHelperText, customId.index)));
+            await interaction.message!.channel.send(new Embed(rollEmbed(reRoll(roll.result, customId.index), 
+            interaction.user.id, sprintf(labels.reRollHelperText, customId.index))));
         }
     }
 }

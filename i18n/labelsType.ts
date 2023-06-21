@@ -25,6 +25,7 @@ export type LabelsType = {
     loadCharacterSuccess: string,
     loadCharacterError: string,
     uploadCharacterSuccess: string,
+    uploadCharacterError: string,
     currentCharacter: string,
     loading: string,
     openYourCharacter: string,

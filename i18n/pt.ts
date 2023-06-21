@@ -22,9 +22,10 @@ export const pt: LabelsType = {
     loadCharacterSuccess: "Personagem carregado: %v",
     loadCharacterError: "Erro ao carregar o personagem: %v", 
     uploadCharacterSuccess: "O personagem foi enviado com sucesso", 
+    uploadCharacterError: "O personagem nao pode ser enviado, fale com o seu narrador.",
     currentCharacter: "Personagem selecionado",
     loading: "Carregando...",
-    openYourCharacter: "Abra sua ficha clicando no link!",
+    openYourCharacter: "Abra sua ficha clicando aqui",
     dicePools: {
         attackWithFists: {
             name: "Ataque com os Punhos",

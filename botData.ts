@@ -1,15 +1,17 @@
 import { RollResult } from "./diceRollManager.ts";
-import { Embed, Message, TextChannel } from "./deps.ts";
+import { Embed, EmbedPayload, Message, TextChannel } from "./deps.ts";
 import { labels } from "./i18n/labels.ts";
 import * as characterManager from "./characterManager.ts";
 import { logger } from "./logger.ts";
 
 export const lastRolls: {
     [userId: string]: {
-        embed: Embed,
+        embed: EmbedPayload,
         result: RollResult
     }
 } = {};
+
+export const unlock: string[] = [];
 
 export let outputChannel: TextChannel;
 

@@ -6,7 +6,7 @@ import { ChangeCharacter, ReloadCharacters, SetBonus, SetDifficulty, SetOnus, St
 import { reloadCharactersSolver } from "./solver/reloadCharactersSolver.ts";
 import { setDifficultySolver } from "./solver/setDifficultySolver.ts";
 import { setModifierSolver } from "./solver/setModifierSolver.ts";
-import { characterSolver } from "./solver/characterSolver.ts";
+import { CharacterSolverValue, CharacterSolverValueType, characterSolver } from "./solver/characterSolver.ts";
 
 const defaultActions: Action[] = [
     {
@@ -240,7 +240,10 @@ export function buildActions(): Action[] {
             emoji: {
                 name: '🧛'
             },
-            value: {isChange: true, id: key}
+            value: <CharacterSolverValue> {
+                type:  CharacterSolverValueType.Change,
+                id: key
+            }
         }]
 
         const userId = characterManager.getUserIdByCharacterId(key);
@@ -249,9 +252,21 @@ export function buildActions(): Action[] {
             buttons.push({
                 style: ButtonStyle.SUCCESS,
                 emoji: {
+                    name: '🔓'
+                },
+                value: <CharacterSolverValue> {
+                    type:  CharacterSolverValueType.Unlock,
+                    id: userId
+                }
+            },{
+                style: ButtonStyle.PRIMARY,
+                emoji: {
                     name: '🔗'
                 },
-                value: {isChange: false, id: userId}
+                value: <CharacterSolverValue> {
+                    type:  CharacterSolverValueType.Link,
+                    id: userId
+                }
             });
         }
 
