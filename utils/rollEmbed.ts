@@ -9,7 +9,18 @@ export function rollEmbed(result: RollResult, authorId: string, title?: string):
         embed.title = title;
     }
     
-    embed.description = result.dices.map(d => d.isHunger ? `__**${d.value}**__` : d.value).join(' - ');
+    embed.description = result.dices.map(d => {
+        if (d.isHunger) {
+            if (d.value == 1) {
+                return "<:bestial:1121193659145134090>";
+            } else {
+                return `__**${d.value}**__`
+            }
+        }
+        else {
+            return d.value;
+        }
+    }).join(' ');
 
     let statusLabel = "";
 
