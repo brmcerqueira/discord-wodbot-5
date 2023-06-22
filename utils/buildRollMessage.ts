@@ -13,22 +13,35 @@ export function buildRollMessage(result: RollResult, guildId: string, authorId: 
         embed.title = title;
     }
     
-    const content = result.dices.map(d => {
+    const content = result.dices.sort((left, right) => right.isHunger == left.isHunger ? (right.value - left.value) : 
+    (right.isHunger ? 1 : -1)).map(d => {
+        let emoji: EmojiPayload | null = null;
         if (d.isHunger) {
             if (d.value == 1) {
-                return printEmoji(botData.emojis.bestial[guildId]);
+                emoji = botData.emojis.bestial[guildId];
             } 
             else if (d.value == 10) {
-                return printEmoji(botData.emojis.messy[guildId]);
+                emoji = botData.emojis.messy[guildId];
+            } 
+            else if (d.value >= 6 && d.value <= 9) {
+                emoji = botData.emojis.successRed[guildId];
             } 
             else {
-                //return '';
+                emoji = botData.emojis.noneRed[guildId];
             }
         }
         else {
-            //return '';
+            if (d.value == 10) {
+                emoji = botData.emojis.critical[guildId];
+            } 
+            else if (d.value >= 6 && d.value <= 9) {
+                emoji = botData.emojis.successBlack[guildId];
+            } 
+            else {
+                emoji = botData.emojis.noneBlack[guildId];
+            }
         }
-        return printEmoji(botData.emojis.bestial[guildId]);
+        return printEmoji(emoji!);
     }).join(' ');
 
     let statusLabel = "";

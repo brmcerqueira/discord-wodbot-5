@@ -18,11 +18,21 @@ type EmojiDictionary = {
 }
 
 export const emojis: {
-    messy: EmojiDictionary
     bestial: EmojiDictionary
+    critical: EmojiDictionary
+    messy: EmojiDictionary
+    noneBlack: EmojiDictionary
+    noneRed: EmojiDictionary
+    successBlack: EmojiDictionary
+    successRed: EmojiDictionary
 } = {
+    bestial: {},
+    critical: {},
     messy: {},
-    bestial: {}
+    noneBlack: {},
+    noneRed: {},
+    successBlack: {},
+    successRed: {}
 }
 
 export let outputChannel: TextChannel;
