@@ -1,5 +1,5 @@
 import { RollResult } from "./diceRollManager.ts";
-import { Embed, EmbedPayload, Message, TextChannel } from "./deps.ts";
+import { Embed, EmbedPayload, EmojiPayload, Message, TextChannel } from "./deps.ts";
 import { labels } from "./i18n/labels.ts";
 import * as characterManager from "./characterManager.ts";
 import { logger } from "./logger.ts";
@@ -12,6 +12,16 @@ export const lastRolls: {
 } = {};
 
 export const unlock: string[] = [];
+
+type EmojiDictionary = {
+    [guildId: string]: EmojiPayload
+}
+
+export const emojis: {
+    bestial: EmojiDictionary
+} = {
+    bestial: {}
+}
 
 export let outputChannel: TextChannel;
 

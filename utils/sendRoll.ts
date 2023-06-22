@@ -10,6 +10,7 @@ export type SendRollData = {
 }
 
 export async function sendRoll(send: (data: SendRollData) => Promise<void>,
+    guildId: string,
     authorId: string,
     dices: number,
     hunger: number,
@@ -33,7 +34,7 @@ export async function sendRoll(send: (data: SendRollData) => Promise<void>,
 
     const margin = dices - hunger;
 
-    const embed = rollEmbed(result, authorId, description);
+    const embed = rollEmbed(result, guildId, authorId, description);
 
     const options: SendRollData = {
         embeds: [embed]

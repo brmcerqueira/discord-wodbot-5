@@ -1,8 +1,9 @@
 import { RollResult, RollStatus } from "../diceRollManager.ts";
 import { labels } from "../i18n/labels.ts";
-import { EmbedPayload } from "../deps.ts";
+import { EmbedPayload, EmojiPayload } from "../deps.ts";
+import * as botData from "../botData.ts";
 
-export function rollEmbed(result: RollResult, authorId: string, title?: string): EmbedPayload {
+export function rollEmbed(result: RollResult, guildId: string, authorId: string, title?: string): EmbedPayload {
     const embed: EmbedPayload = {};
 
     if (title) {
@@ -12,8 +13,9 @@ export function rollEmbed(result: RollResult, authorId: string, title?: string):
     embed.description = result.dices.map(d => {
         if (d.isHunger) {
             if (d.value == 1) {
-                return "<:bestial:1121193659145134090>";
-            } else {
+                return printEmoji(botData.emojis.bestial[guildId]);
+            } 
+            else {
                 return `__**${d.value}**__`
             }
         }
@@ -83,4 +85,8 @@ export function rollEmbed(result: RollResult, authorId: string, title?: string):
     }
 
     return embed;
+}
+
+function printEmoji(emoji: EmojiPayload): string {
+    return `<:${emoji.name}:${emoji.id}>`;
 }

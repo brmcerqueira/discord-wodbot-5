@@ -16,7 +16,7 @@ export async function reRollSolver(interaction: Interaction, customId: CustomId)
                 components: []
             });
             await interaction.message!.channel.send(new Embed(rollEmbed(reRoll(roll.result, customId.index), 
-            interaction.user.id, sprintf(labels.reRollHelperText, customId.index))));
+            interaction.guild!.id, interaction.user.id, sprintf(labels.reRollHelperText, customId.index))));
         }
     }
 }

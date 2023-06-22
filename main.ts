@@ -1,4 +1,4 @@
-import { ApplicationCommandPayload, Client, GatewayIntents, Interaction, InteractionMessageComponentData, InteractionResponseType, InteractionType, InteractionApplicationCommandData, MessageComponentData, MessageComponentType, TextChannel, Embed, EmbedPayload } from "./deps.ts";
+import { ApplicationCommandPayload, Client, GatewayIntents, Interaction, InteractionMessageComponentData, InteractionResponseType, InteractionType, InteractionApplicationCommandData, MessageComponentData, MessageComponentType, TextChannel, Embed, EmbedPayload, base64 } from "./deps.ts";
 import { labels } from "./i18n/labels.ts";
 import { config } from "./config.ts";
 import { logger } from "./logger.ts";
@@ -154,6 +154,23 @@ client.on('ready', async () => {
     });
   }
 
+  for (const guild of await client.guilds.array()) {
+    const guildEmojis = await client.rest.endpoints.listGuildEmojis(guild.id);
+
+    for (const name in botData.emojis) {
+      let emoji = guildEmojis.find(e => e.name == name);
+
+      if (!emoji) {
+        emoji = await client.rest.endpoints.createGuildEmoji(guild.id, {
+          name: name,
+          image: `data:image/png;base64,${base64.encode(await Deno.readFile(`./emojis/${name}.png`))}`
+        });
+      }
+
+      (<any>botData.emojis)[name][guild.id] = emoji;
+    }
+  }
+
   await client.users.fetch(config.storytellerId);
   for (const id of Object.keys(characterManager.users)) {
     await client.users.fetch(id);
@@ -214,7 +231,7 @@ client.on('interactionCreate', async (interaction: Interaction) => {
           embeds: m.embeds,
           components: m.components
         });
-      }, interaction.user.id, dices, hunger, difficulty, 0, description);
+      }, interaction.guild!.id, interaction.user.id, dices, hunger, difficulty, 0, description);
     }
     else if(data.name == labels.commands.uploadCharacter.name) {
       const attachment: Attachment = (<any>data.resolved)["attachments"][data.options[0].value];
