@@ -3,14 +3,17 @@ import { labels } from "../i18n/labels.ts";
 import { EmbedPayload, EmojiPayload } from "../deps.ts";
 import * as botData from "../botData.ts";
 
-export function rollEmbed(result: RollResult, guildId: string, authorId: string, title?: string): EmbedPayload {
+export function buildRollMessage(result: RollResult, guildId: string, authorId: string, title?: string): {
+    content: string,
+    embed: EmbedPayload
+} {
     const embed: EmbedPayload = {};
 
     if (title) {
         embed.title = title;
     }
     
-    embed.description = result.dices.map(d => {
+    const content = result.dices.map(d => {
         if (d.isHunger) {
             if (d.value == 1) {
                 return printEmoji(botData.emojis.bestial[guildId]);
@@ -19,12 +22,13 @@ export function rollEmbed(result: RollResult, guildId: string, authorId: string,
                 return printEmoji(botData.emojis.messy[guildId]);
             } 
             else {
-                return `__**${d.value}**__`
+                //return '';
             }
         }
         else {
-            return d.value;
+            //return '';
         }
+        return printEmoji(botData.emojis.bestial[guildId]);
     }).join(' ');
 
     let statusLabel = "";
@@ -87,7 +91,7 @@ export function rollEmbed(result: RollResult, guildId: string, authorId: string,
         });
     }
 
-    return embed;
+    return {content, embed};
 }
 
 function printEmoji(emoji: EmojiPayload): string {

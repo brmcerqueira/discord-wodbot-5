@@ -115,7 +115,7 @@ client.on('ready', async () => {
         type: 4,
         required: true,
         min_value: 1,
-        max_value: 99
+        max_value: 30
       }, {
         name: labels.commands.roll.hunger.name,
         description: labels.commands.roll.hunger.description,
@@ -228,6 +228,7 @@ client.on('interactionCreate', async (interaction: Interaction) => {
       await sendRoll(async m => {
         await interaction.respond({
           type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+          content: m.content,
           embeds: m.embeds,
           components: m.components
         });

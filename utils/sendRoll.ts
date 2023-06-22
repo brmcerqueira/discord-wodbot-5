@@ -1,11 +1,12 @@
 import { roll } from "../diceRollManager.ts";
 import * as botData from "../botData.ts";
 import { ButtonStyle, Embed, EmbedPayload, MessageComponentData, MessageComponentType } from "../deps.ts";
-import { rollEmbed } from "./rollEmbed.ts";
 import { ReRoll, buildId } from "../scope.ts";
+import { buildRollMessage } from "./buildRollMessage.ts";
 
 export type SendRollData = {
-    embeds?: Array<Embed | EmbedPayload>
+    content: string,
+    embeds: Array<Embed | EmbedPayload>
     components?: MessageComponentData[]
 }
 
@@ -34,10 +35,11 @@ export async function sendRoll(send: (data: SendRollData) => Promise<void>,
 
     const margin = dices - hunger;
 
-    const embed = rollEmbed(result, guildId, authorId, description);
+    const message = buildRollMessage(result, guildId, authorId, description);
 
     const options: SendRollData = {
-        embeds: [embed]
+        content: message.content,
+        embeds: [message.embed]
     };
 
     if (margin > 0) {
@@ -86,7 +88,7 @@ export async function sendRoll(send: (data: SendRollData) => Promise<void>,
     await send(options);
 
     botData.lastRolls[authorId.toString()] = {
-        embed: embed,
+        embed: message.embed,
         result: result
     };
 }
