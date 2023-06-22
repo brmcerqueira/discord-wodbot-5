@@ -15,6 +15,9 @@ export function rollEmbed(result: RollResult, guildId: string, authorId: string,
             if (d.value == 1) {
                 return printEmoji(botData.emojis.bestial[guildId]);
             } 
+            else if (d.value == 10) {
+                return printEmoji(botData.emojis.messy[guildId]);
+            } 
             else {
                 return `__**${d.value}**__`
             }

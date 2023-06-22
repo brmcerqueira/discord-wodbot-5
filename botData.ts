@@ -18,8 +18,10 @@ type EmojiDictionary = {
 }
 
 export const emojis: {
+    messy: EmojiDictionary
     bestial: EmojiDictionary
 } = {
+    messy: {},
     bestial: {}
 }
 

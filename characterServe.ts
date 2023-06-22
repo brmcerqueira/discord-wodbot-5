@@ -1,5 +1,5 @@
 import { charactersPath, outPath } from "./config.ts";
-import { base64 } from "./deps.ts";
+import { base64url } from "./deps.ts";
 import { index } from "./index.tsx";
 
 const etags: {
@@ -77,7 +77,7 @@ export async function buildLightPdf(userId: string, file: string) {
 }
 
 function decodeBase64(data: string): string {
-    return textDecoder.decode(base64.decode(data));
+    return textDecoder.decode(base64url.decode(data));
 }
 
 async function respond404(event: Deno.RequestEvent) {

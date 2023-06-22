@@ -1,7 +1,7 @@
 import { Character } from "./character.ts";
 import { logger } from "./logger.ts";
 import { labels } from "./i18n/labels.ts";
-import { User, base64, path, pdf } from "./deps.ts";
+import { User, base64url, path, pdf } from "./deps.ts";
 import { buildLightPdf } from "./characterServe.ts";
 import { charactersPath } from "./config.ts";
 
@@ -18,7 +18,7 @@ export const users: {
 export async function load(): Promise<void> {
   for await (const entry of Deno.readDir(charactersPath)) {
     if (entry.isFile && entry.name.endsWith(".pdf")) {
-      await loadCharacter(entry.name, base64.encode(entry.name));
+      await loadCharacter(entry.name, base64url.encode(entry.name));
     }
   }
 }
@@ -28,7 +28,7 @@ export async function watch(): Promise<void> {
     if (event.kind == "create" || event.kind == "modify") {
       for (const file of event.paths.map(p => path.parse(p))) {
         if (file.ext == ".pdf") {
-          const id = base64.encode(file.base);
+          const id = base64url.encode(file.base);
           if (!characters[id]
             || (characters[id] && (new Date().getTime() - characters[id].dateTime.getTime()) > margin)) {
             await loadCharacter(file.base, id);

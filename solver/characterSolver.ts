@@ -1,6 +1,6 @@
 import * as botData from "../botData.ts";
 import { config } from "../config.ts";
-import { ButtonStyle, Embed, Interaction, MessageComponentType, base64 } from "../deps.ts";
+import { ButtonStyle, Interaction, MessageComponentType, base64url } from "../deps.ts";
 import { labels } from "../i18n/labels.ts";
 
 export enum CharacterSolverValueType {
@@ -33,7 +33,7 @@ export async function characterSolver(interaction: Interaction, value: Character
                             type: MessageComponentType.Button,
                             label: labels.openYourCharacter,
                             style: ButtonStyle.LINK,
-                            url: `${config.host}/?id=${base64.encode(value.id)}`
+                            url: `${config.host}/?id=${base64url.encode(value.id)}`
                         }]
                     }]
                 });
