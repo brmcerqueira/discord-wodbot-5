@@ -4,6 +4,21 @@ export type Damage = {
     penalty: number;
 }
 
+export type Disciplines = {
+    animalism: number; 
+    auspex: number;
+    bloodSorcery: number; 
+    celerity: number;
+    dominate: number; 
+    fortitude: number; 
+    obfuscate: number; 
+    oblivion: number; 
+    potence: number; 
+    presence: number; 
+    protean: number; 
+    thinBloodAlchemy: number;
+}
+
 export type Character = {
     dateTime: Date;
     name: string;
@@ -59,7 +74,8 @@ export type Character = {
             science: number;
             technology: number;
         };
-    }
+    },
+    disciplines: Disciplines
     health: Damage;
     willpower: Damage;
     humanity: {

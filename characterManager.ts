@@ -1,4 +1,4 @@
-import { Character } from "./character.ts";
+import { Character, Disciplines } from "./character.ts";
 import { logger } from "./logger.ts";
 import { labels } from "./i18n/labels.ts";
 import { User, base64url, path, pdf } from "./deps.ts";
@@ -73,6 +73,64 @@ async function loadCharacter(file: string, id: string) {
 
     const bloodPotencyHigh = extract(form, "bloodPotency", 1, 5, ".high");
 
+    const disciplines: Disciplines = {
+      animalism: 0,
+      auspex: 0,
+      bloodSorcery: 0,
+      celerity: 0,
+      dominate: 0,
+      fortitude: 0,
+      obfuscate: 0,
+      oblivion: 0,
+      potence: 0,
+      presence: 0,
+      protean: 0,
+      thinBloodAlchemy: 0
+    }
+
+    for (const suffix of [".0.0", ".0.1", ".0.2", ".1.0", ".1.1", ".1.2"]) {
+      const value = extract(form, "discipline", 1, 5, suffix);
+
+      switch (extractDropdownSelected(form, `discipline${suffix}`)) {
+        case 1:
+          disciplines.thinBloodAlchemy = value;
+          break;
+        case 2:
+          disciplines.animalism = value;
+          break;
+        case 3:
+          disciplines.auspex = value;
+          break;
+        case 4:
+          disciplines.celerity = value;
+          break;
+        case 5:
+          disciplines.dominate = value;
+          break;
+        case 6:
+          disciplines.bloodSorcery = value;
+          break;
+        case 7:
+          disciplines.fortitude = value;
+          break;
+        case 8:
+          disciplines.oblivion = value;
+          break;           
+        case 9:
+          disciplines.obfuscate = value;
+          break;                   
+        case 10:
+          disciplines.potence = value;
+          break;
+        case 11:
+          disciplines.presence = value;
+          break;
+        case 12:
+          disciplines.protean = value;
+          break;
+      }
+    }
+
     const character: Character = {
       dateTime: dateTime,
       name: form.getTextField("name").getText() || "",
@@ -129,6 +187,7 @@ async function loadCharacter(file: string, id: string) {
           technology: extract(form, "mental", 1, 5, ".technology")
         }
       },
+      disciplines: disciplines,
       health: {
         superficial: healthSuperficial,
         aggravated: healthAggravated,
@@ -163,10 +222,10 @@ async function loadCharacter(file: string, id: string) {
       await buildLightPdf(userId, file);
     }
 
-    logger.info(labels.loadCharacterSuccess, character.name);
-  } 
+    logger.info(labels.loadCharacterSuccess, character.name, JSON.stringify(character));
+  }
   catch (error) {
-    logger.error(labels.loadCharacterError, file, JSON.stringify(error));
+    logger.error(labels.loadCharacterError, file);
   }
 }
 
@@ -197,5 +256,5 @@ function extractDropdownSelected(form: pdf.PDFForm, name: string, parseResult?: 
 }
 
 function penalty(left: number): number {
-  return left <= 0 ? 3 : (left >= 1 && left <= 3 ? (3 - left) : 0);       
+  return left <= 0 ? 3 : (left >= 1 && left <= 3 ? (3 - left) : 0);
 }

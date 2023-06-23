@@ -89,6 +89,51 @@ const form = pdfDoc.getForm();
 form.getField('Nome').acroField.setPartialName("name");
 form.getField('Geração_dropdown').acroField.setPartialName("generation");
 
+const clanDropdown = form.getDropdown('Clã_dropdown');
+clanDropdown.acroField.setPartialName("clan");
+clanDropdown.setOptions(['  ',
+'Banu Haqim',
+'Brujah',
+'Caitiff',
+'Gangrel',
+'Hecata',
+'Lasombra',
+'Malkavianos',
+'Nosferatu',
+'O Ministério',
+'Ravnos',
+'Salubri',
+'Sangue-Ralo',
+'Toreador',
+'Tremere',
+'Tzimisce',
+'Ventrue']);
+
+
+form.getField('Disciplina_dropdown#1.0.0').acroField.getParent()?.getParent()?.setPartialName("discipline");
+
+for (const suffix of [".0.0", ".0.1", ".0.2", ".1.0", ".1.1", ".1.2"]) {
+    const dropdown = form.getDropdown(`discipline${suffix}`);
+    dropdown.disableEditing();
+    dropdown.setOptions(['  ', 
+    'Alquimia Sangue-Ralo', 
+    'Animalismo', 
+    'Auspícios', 
+    'Celeridade', 
+    'Dominação',
+    'Feitiçaria de Sangue', 
+    'Fortitude',
+    'Oblívio', 
+    'Ofuscação', 
+    'Potência', 
+    'Presença', 
+    'Proteanismo']);
+}
+
+for (let index = 1; index <= 5; index++) {
+    form.getField(`Disc${index}.0.0`).acroField.getParent()?.getParent()?.setPartialName(`discipline_${index}`);
+}
+
 editRange(form, "PotSan", "low", 1, 5, "bloodPotency", ".0");
 editRange(form, "PotSan", "high", 1, 5, "bloodPotency", ".1");
 
