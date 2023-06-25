@@ -7,6 +7,7 @@ import * as characterServe from "./characterServe.ts";
 import * as botData from "./botData.ts";
 import * as characterManager from "./characterManager.ts";
 import * as storyteller from "./storyteller.ts";
+import * as colors from "./colors.ts";
 import { sendRoll } from "./utils/sendRoll.ts";
 import { Action } from "./action.ts";
 import { ReRoll, buildId, checkScope, parseCustomId } from "./scope.ts";
@@ -246,15 +247,13 @@ client.on('interactionCreate', async (interaction: Interaction) => {
 
         embeds.push({
           title: labels.uploadCharacterSuccess,
-          //Verde
-          color: 3066993
+          color: colors.Green
         });
       }
       else {
         embeds.push({
           title: labels.uploadCharacterError,
-          //Vermelho
-          color: 15158332
+          color: colors.Red
         });
       }
 

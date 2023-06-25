@@ -2,6 +2,7 @@ import { RollResult } from "./diceRollManager.ts";
 import { Embed, EmbedPayload, EmojiPayload, Message, TextChannel } from "./deps.ts";
 import { labels } from "./i18n/labels.ts";
 import * as characterManager from "./characterManager.ts";
+import * as colors from "./colors.ts";
 import { logger } from "./logger.ts";
 
 export const lastRolls: {
@@ -74,7 +75,6 @@ export function buildCurrentCharacterEmbed(name: string): Embed {
     return new Embed({
         title: labels.currentCharacter,
         description: name,
-        //Cinza
-        color: 9807270
+        color: colors.Gray
     });
 }

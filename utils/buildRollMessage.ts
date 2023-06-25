@@ -2,6 +2,7 @@ import { RollResult, RollStatus } from "../diceRollManager.ts";
 import { labels } from "../i18n/labels.ts";
 import { EmbedPayload, EmojiPayload } from "../deps.ts";
 import * as botData from "../botData.ts";
+import * as colors from "../colors.ts";
 
 export function buildRollMessage(result: RollResult, guildId: string, authorId: string, title?: string): {
     content: string,
@@ -49,28 +50,24 @@ export function buildRollMessage(result: RollResult, guildId: string, authorId: 
     switch (result.status) {
         case RollStatus.BestialFailure:
             statusLabel = labels.bestialFailure;
-            //Vermelho
-            embed.color = 15158332;
+            embed.color = colors.Red;
             break;                
         case RollStatus.Failure:
             statusLabel = labels.failure;
-            //Laranja
-            embed.color = 15105570;
+            embed.color = colors.Orange;
             break;
         case RollStatus.Success:
             statusLabel = labels.success;
-            //Verde
-            embed.color = 3066993;
+            embed.color = colors.Green;
             break;
         case RollStatus.RegularCritical:
             statusLabel = labels.regularCritical;
-            //Azul
-            embed.color = 3447003;
+            embed.color = colors.Blue;
             break;
         case RollStatus.MessyCritical:
             statusLabel = labels.messyCritical;
-            //Roxo
-            embed.color = 10181046;
+
+            embed.color = colors.Purple;
             break;            
     }
 
