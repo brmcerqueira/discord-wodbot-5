@@ -66,7 +66,6 @@ export function buildRollMessage(result: RollResult, guildId: string, authorId: 
             break;
         case RollStatus.MessyCritical:
             statusLabel = labels.messyCritical;
-
             embed.color = colors.Purple;
             break;            
     }

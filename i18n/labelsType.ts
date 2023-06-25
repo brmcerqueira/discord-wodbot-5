@@ -29,9 +29,6 @@ export type LabelsType = {
     currentCharacter: string,
     loading: string,
     openYourCharacter: string,
-    dicePools: {
-        attackWithFists: DicePoolType
-    },
     actions: {
         setDifficulty: string,
         setBonus: string,
@@ -68,5 +65,6 @@ export type LabelsType = {
                 description: string
             }
         }
-    }
+    },
+    dicePools: DicePoolType[]
 }

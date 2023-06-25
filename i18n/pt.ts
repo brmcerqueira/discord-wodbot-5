@@ -26,12 +26,6 @@ export const pt: LabelsType = {
     currentCharacter: "Personagem selecionado",
     loading: "Carregando...",
     openYourCharacter: "Abra sua ficha clicando aqui",
-    dicePools: {
-        attackWithFists: {
-            name: "Ataque com os Punhos",
-            description: "Ataque com os Punhos [Força + Briga]"
-        }
-    },
     actions: {
         setDifficulty: "Alterar dificuldade",
         setBonus: "Inserir uma bonificação",
@@ -68,5 +62,60 @@ export const pt: LabelsType = {
                 description: "Ficha a ser enviada"
             }
         }
-    }
+    },
+    dicePools: [{
+        name: "Ameaçar veladamente",
+        description: "Ameaçar veladamente [Manipulação + Intimidação]"
+    },{
+        name: "Ataque com os punhos",
+        description: "Ataque com os punhos [Força + Briga]"
+    },{
+        name: "Cantar",
+        description: "Cantar [Carisma + Performance]"
+    },{
+        name: "Conduzir suas ações com perfeição em um jantar formal",
+        description: "Conduzir suas ações com perfeição em um jantar formal [Destreza + Etiqueta]"
+    },{
+        name: "Corrida prolongada",
+        description: "Corrida prolongada [Vigor + Atletismo]"
+    },{
+        name: "Decifrar uma ameaça velada",
+        description: "Decifrar uma ameaça velada [Raciocínio + Intimidação]"
+    },{
+        name: "Descobrir o nível de segurança de um local",
+        description: "Descobrir o nível de segurança de um local [Inteligência + Ladroagem]"
+    },{
+        name: "Descobrir informações sobre uma gangue",
+        description: "Descobrir informações sobre uma gangue [Carisma + Manha]"
+    },{
+        name: "Desviar de um obstáculo enquanto dirigi",
+        description: "Desviar de um obstáculo enquanto dirigi [Raciocínio + Condução]"
+    },{
+        name: "Distrair cães de guarda enquanto se infiltra",
+        description: "Distrair cães de guarda enquanto se infiltra [Manipulação + Empatia com Animais]"
+    },{
+        name: "Emparelhar um veículo enquanto dirigi",
+        description: "Emparelhar um veículo enquanto dirigi [Raciocínio + Condução]"
+    },{
+        name: "Encontrar abrigo para passar o dia",
+        description: "Encontrar abrigo para passar o dia [Raciocínio + Sobrevivência]"
+    },{
+        name: "Fazer uma tocaia",
+        description: "Fazer uma tocaia [Vigor + Furtividade]"
+    },{
+        name: "Intimidar",
+        description: "Intimidar [Carisma + Intimidação]"
+    },{
+        name: "Ler um livro esotérico",
+        description: "Ler um livro esotérico [Inteligência + Ocultismo]"
+    },{
+        name: "Reforçar uma porta de refúgio",
+        description: "Reforçar uma porta de refúgio [Raciocínio + Ofícios]"
+    },{
+        name: "Sacar uma arma de forma velada",
+        description: "Sacar uma arma de forma velada [Destreza + Subterfúgio]"
+    },{
+        name: "Verificar credibilidade de uma história",
+        description: "Verificar credibilidade de uma história [Manipulação + Persuasão]"
+    }]
 };
